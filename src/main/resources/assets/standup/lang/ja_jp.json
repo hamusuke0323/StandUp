@@ -1,0 +1,5 @@
+{
+  "standup.key.stand.updown": "スタンドを出す/引っ込める",
+  "standup.key.stand.holdorrelease": "スタンド使いをつかむ/はなす",
+  "standup.key.stand.toggle": "スタンド操作モードを切り替える"
+}

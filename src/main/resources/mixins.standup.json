@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.hamusuke.standup.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "ContainerOpenersCounterMixin",
+    "FenceGateBlockMixin",
+    "LivingEntityMixin",
+    "PlayerListMixin",
+    "PlayerMixin",
+    "ProjectileMixin",
+    "ServerGamePacketListenerImplMixin",
+    "ServerPlayerMixin",
+    "TickRateManagerMixin"
+  ],
+  "client": [
+    "client.ForgeGuiMixin",
+    "client.GameRendererMixin",
+    "client.GuiMixin",
+    "client.LocalPlayerMixin",
+    "client.VanillaGuiOverlayMixin"
+  ],
+  "refmap": "mixins.standup.refmap.json"
+}

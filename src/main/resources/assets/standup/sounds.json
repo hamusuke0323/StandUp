@@ -1,0 +1,9 @@
+{
+  "punch": {
+    "sounds": [
+      "standup:punch1",
+      "standup:punch2",
+      "standup:punch3"
+    ]
+  }
+}
