@@ -1,6 +1,6 @@
 package com.hamusuke.standup.stand.ai.goal.target;
 
-import com.hamusuke.standup.stand.Stand;
+import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;

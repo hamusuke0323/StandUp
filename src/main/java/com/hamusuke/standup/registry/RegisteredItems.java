@@ -1,6 +1,6 @@
-package com.hamusuke.standup.registries;
+package com.hamusuke.standup.registry;
 
-import net.minecraft.world.food.FoodProperties;
+import com.hamusuke.standup.world.item.StandCardItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -11,6 +11,5 @@ import static com.hamusuke.standup.StandUp.MOD_ID;
 public class RegisteredItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
 
-    public static final RegistryObject<Item> EXAMPLE_ITEM = ITEMS.register("example_item", () -> new Item(new Item.Properties().food(new FoodProperties.Builder()
-            .alwaysEat().nutrition(1).saturationMod(2f).build())));
+    public static final RegistryObject<Item> STAND_CARD = ITEMS.register("stand_card", StandCardItem::new);
 }

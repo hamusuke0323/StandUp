@@ -1,6 +1,6 @@
 package com.hamusuke.standup.mixin;
 
-import com.hamusuke.standup.stand.Stand;
+import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;

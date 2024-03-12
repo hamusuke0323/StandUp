@@ -1,6 +1,6 @@
 package com.hamusuke.standup.stand.ai.goal;
 
-import com.hamusuke.standup.stand.Stand;
+import com.hamusuke.standup.stand.stands.Stand;
 import com.hamusuke.standup.util.MthH;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;

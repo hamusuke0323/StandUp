@@ -1,6 +1,6 @@
 package com.hamusuke.standup.mixin;
 
-import com.hamusuke.standup.stand.Stand;
+import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

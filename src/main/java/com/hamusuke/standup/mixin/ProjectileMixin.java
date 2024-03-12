@@ -1,7 +1,7 @@
 package com.hamusuke.standup.mixin;
 
-import com.hamusuke.standup.stand.Stand;
 import com.hamusuke.standup.invoker.PlayerInvoker;
+import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Projectile;

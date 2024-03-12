@@ -3,10 +3,7 @@ package com.hamusuke.standup.network;
 import com.hamusuke.standup.StandUp;
 import com.hamusuke.standup.network.packet.Packet;
 import com.hamusuke.standup.network.packet.c2s.*;
-import com.hamusuke.standup.network.packet.s2c.HoldOrReleaseStandOwnerNotify;
-import com.hamusuke.standup.network.packet.s2c.StandAppearNotify;
-import com.hamusuke.standup.network.packet.s2c.StandDisappearNotify;
-import com.hamusuke.standup.network.packet.s2c.StandOperationModeToggleNotify;
+import com.hamusuke.standup.network.packet.s2c.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,7 +11,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.network.SimpleChannel;
 
 import java.util.Objects;
@@ -43,6 +39,7 @@ public final class NetworkManager {
     private static void registerS2CPackets() {
         MAIN.messageBuilder(HoldOrReleaseStandOwnerNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(HoldOrReleaseStandOwnerNotify::new).consumerNetworkThread(HoldOrReleaseStandOwnerNotify::handle).add();
         MAIN.messageBuilder(StandAppearNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandAppearNotify::new).consumerNetworkThread(StandAppearNotify::handle).add();
+        MAIN.messageBuilder(StandCardSetNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandCardSetNotify::new).consumerNetworkThread(StandCardSetNotify::handle).add();
         MAIN.messageBuilder(StandDisappearNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandDisappearNotify::new).consumerNetworkThread(StandDisappearNotify::handle).add();
         MAIN.messageBuilder(StandOperationModeToggleNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandOperationModeToggleNotify::new).consumerNetworkThread(StandOperationModeToggleNotify::handle).add();
     }
@@ -54,12 +51,18 @@ public final class NetworkManager {
     }
 
     public static void sendToClient(Packet packet, ServerPlayer serverPlayer) {
+        if (serverPlayer.connection == null) {
+            return;
+        }
+
         MAIN.send(packet, serverPlayer.connection.getConnection());
     }
 
-    public static void sendToDimension(Packet packet, ServerPlayer serverPlayer) {
-        MAIN.send(packet, new PacketTarget(packet1 -> {
-            serverPlayer.serverLevel().players().forEach(player -> player.connection.send(packet1));
-        }, NetworkDirection.PLAY_TO_CLIENT));
-    }
+//    public static void sendToAll(Packet packet, ServerPlayer serverPlayer) {
+//        MAIN.send(packet, new PacketTarget(packet1 -> serverPlayer.getServer().getPlayerList().broadcastAll(packet1), NetworkDirection.PLAY_TO_CLIENT));
+//    }
+//
+//    public static void sendToAllInTheSameDimension(Packet packet, ServerPlayer serverPlayer) {
+//        MAIN.send(packet, new PacketTarget(packet1 -> serverPlayer.getServer().getPlayerList().broadcastAll(packet1, serverPlayer.serverLevel().dimension()), NetworkDirection.PLAY_TO_CLIENT));
+//    }
 }

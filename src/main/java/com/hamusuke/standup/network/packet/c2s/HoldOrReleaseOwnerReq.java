@@ -8,13 +8,13 @@ public class HoldOrReleaseOwnerReq implements Packet {
     @Override
     public boolean handle(Context context) {
         context.enqueueWork(() -> {
-           if (context.getSender() instanceof PlayerInvoker invoker && invoker.isControllingStand()) {
-               if (invoker.getStand().isHoldingOwner()) {
-                   invoker.getStand().stopHoldingOwner();
-               } else {
-                   invoker.getStand().startHoldingOwner();
-               }
-           }
+            if (context.getSender() instanceof PlayerInvoker invoker && invoker.isStandAlive()) {
+                if (invoker.getStand().isHoldingOwner() && !context.getSender().isPassenger()) {
+                    invoker.getStand().stopHoldingOwner();
+                } else {
+                    invoker.getStand().startHoldingOwner();
+                }
+            }
         });
 
         return true;

@@ -1,6 +1,6 @@
 package com.hamusuke.standup.mixin.client;
 
-import com.hamusuke.standup.stand.Stand;
+import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.client.gui.overlay.ForgeGui;

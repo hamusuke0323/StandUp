@@ -3,14 +3,16 @@ package com.hamusuke.standup.mixin;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.s2c.StandAppearNotify;
+import com.hamusuke.standup.network.packet.s2c.StandCardSetNotify;
 import com.hamusuke.standup.network.packet.s2c.StandDisappearNotify;
-import com.hamusuke.standup.stand.Stand;
+import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,11 +23,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static com.hamusuke.standup.registry.RegisteredItems.STAND_CARD;
+
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker {
     @Unique
     @Nullable
     protected Stand stand;
+    @Unique
+    protected ItemStack standCard = ItemStack.EMPTY;
 
     protected PlayerMixin(EntityType<? extends LivingEntity> p_20966_, Level p_20967_) {
         super(p_20966_, p_20967_);
@@ -44,7 +50,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
 
         this.stand = stand;
         if (!this.level().isClientSide && this.stand.getOwner() != null) {
-            NetworkManager.sendToDimension(new StandAppearNotify(this.stand.getOwner().getId(), this.stand.getId()), (ServerPlayer) (Object) this);
+            NetworkManager.sendToClient(new StandAppearNotify(this.stand.getOwner().getId(), this.stand.getId()), (ServerPlayer) (Object) this);
         }
     }
 
@@ -58,7 +64,25 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
         this.stand = null;
 
         if (!this.level().isClientSide && owner != null) {
-            NetworkManager.sendToDimension(new StandDisappearNotify(owner.getId()), (ServerPlayer) owner);
+            NetworkManager.sendToClient(new StandDisappearNotify(owner.getId()), (ServerPlayer) owner);
+        }
+    }
+
+    @Override
+    public ItemStack getStandCard() {
+        if (this.standCard == null) {
+            this.standCard = ItemStack.EMPTY;
+        }
+
+        return this.standCard;
+    }
+
+    @Override
+    public void setStandCard(ItemStack standCard) {
+        this.standCard = standCard == null || !standCard.is(STAND_CARD.get()) ? ItemStack.EMPTY : standCard;
+
+        if (!this.level().isClientSide) {
+            NetworkManager.sendToClient(new StandCardSetNotify((Player) (Object) this, this.standCard), (ServerPlayer) (Object) this);
         }
     }
 

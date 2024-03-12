@@ -1,4 +1,4 @@
-package com.hamusuke.standup.registries;
+package com.hamusuke.standup.registry;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;

@@ -1,6 +1,7 @@
 package com.hamusuke.standup.stand.ai.goal;
 
-import com.hamusuke.standup.stand.Stand;
+import com.hamusuke.standup.CommonConfig;
+import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -42,7 +43,7 @@ public class AutoDoorGoal extends Goal {
     }
 
     protected void setOpen(boolean p_25196_) {
-        if (this.hasDoor) {
+        if (this.hasDoor && CommonConfig.standCanOpenDoor) {
             var blockState = this.stand.level().getBlockState(this.doorPos);
             if (blockState.getBlock() instanceof DoorBlock door) {
                 door.setOpen(this.stand, this.stand.level(), blockState, this.doorPos, p_25196_);
@@ -71,7 +72,7 @@ public class AutoDoorGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return !this.stand.isAggressive() && this.isInFrontOfDoor();
+        return CommonConfig.standCanOpenDoor && !this.stand.isAggressive() && this.isInFrontOfDoor();
     }
 
     @Override

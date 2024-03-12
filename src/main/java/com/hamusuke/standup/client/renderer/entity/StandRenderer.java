@@ -1,17 +1,15 @@
 package com.hamusuke.standup.client.renderer.entity;
 
 import com.hamusuke.standup.client.model.StandModel;
-import com.hamusuke.standup.stand.Stand;
+import com.hamusuke.standup.stand.stands.Stand;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.model.HumanoidArmorModel;
 import net.minecraft.client.model.HumanoidModel.ArmPose;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
-import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -20,20 +18,22 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.UseAnim;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
+@OnlyIn(Dist.CLIENT)
 public class StandRenderer extends HumanoidMobRenderer<Stand, StandModel> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("textures/entity/skeleton/skeleton.png");
 
     public StandRenderer(Context context, boolean slim) {
         super(context, new StandModel(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim), 0.5F);
-        this.addLayer(new HumanoidArmorLayer<>(this, new HumanoidArmorModel<>(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM_INNER_ARMOR : ModelLayers.PLAYER_INNER_ARMOR)), new HumanoidArmorModel<>(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM_OUTER_ARMOR : ModelLayers.PLAYER_OUTER_ARMOR)), context.getModelManager()));
     }
 
     @Override
-    public void render(Stand p_115455_, float p_115456_, float p_115457_, PoseStack p_115458_, MultiBufferSource p_115459_, int p_115460_) {
-        this.setModelProperties(p_115455_);
-        super.render(p_115455_, p_115456_, p_115457_, p_115458_, p_115459_, p_115460_);
+    public void render(Stand stand, float p_115456_, float partialTicks, PoseStack poseStack, MultiBufferSource source, int i) {
+        this.setModelProperties(stand);
+        super.render(stand, p_115456_, partialTicks, poseStack, source, i);
     }
 
     private void setModelProperties(Stand stand) {
@@ -49,8 +49,8 @@ public class StandRenderer extends HumanoidMobRenderer<Stand, StandModel> {
             model.leftSleeve.visible = player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE);
             model.rightSleeve.visible = player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE);
             model.crouching = following ? player.isCrouching() : stand.isCrouching();
-            var pose = getArmPose(following ? player : stand, InteractionHand.MAIN_HAND);
-            var pose1 = getArmPose(following ? player : stand, InteractionHand.OFF_HAND);
+            var pose = stand.isAggressive() ? ArmPose.EMPTY : getArmPose(player, InteractionHand.MAIN_HAND);
+            var pose1 = stand.isAggressive() ? ArmPose.EMPTY : getArmPose(player, InteractionHand.OFF_HAND);
             if (pose.isTwoHanded()) {
                 pose1 = player.getOffhandItem().isEmpty() ? ArmPose.EMPTY : ArmPose.ITEM;
             }

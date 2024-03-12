@@ -1,9 +1,9 @@
 package com.hamusuke.standup.network.packet.c2s;
 
-import com.hamusuke.standup.stand.SlimStand;
-import com.hamusuke.standup.stand.Stand;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.packet.Packet;
+import com.hamusuke.standup.stand.stands.Stand;
+import com.hamusuke.standup.world.item.StandCardItem;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
@@ -40,7 +40,8 @@ public class StandUpReq implements Packet {
                 }
             });
 
-            var stand = slim ? new SlimStand(sender.level(), sender) : new Stand(sender.level(), sender);
+            var ability = StandCardItem.getStandCardFrom(invoker.getStandCard());
+            var stand = ability.createStand(sender.level(), sender, this.slim);
             stand.setPos(sender.getEyePosition().add(0.1D, 0.02D, 0.1D));
             sender.level().addFreshEntity(stand);
         });

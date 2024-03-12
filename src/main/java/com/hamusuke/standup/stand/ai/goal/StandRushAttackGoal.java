@@ -1,6 +1,6 @@
 package com.hamusuke.standup.stand.ai.goal;
 
-import com.hamusuke.standup.stand.Stand;
+import com.hamusuke.standup.stand.stands.Stand;
 import com.hamusuke.standup.util.MthH;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntitySelector;
@@ -148,6 +148,7 @@ public class StandRushAttackGoal extends Goal {
             this.resetAttackCooldown();
             this.lastPunchedHand = this.lastPunchedHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
             this.stand.swing(this.lastPunchedHand);
+            target.invulnerableTime = 0;
             this.stand.doHurtTarget(target);
             this.stand.moveTo(MthH.front(target).subtract(0.0D, this.stand.getEyeHeight() - target.getEyeHeight(), 0.0D));
         }

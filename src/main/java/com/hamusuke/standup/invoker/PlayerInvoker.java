@@ -1,7 +1,8 @@
 package com.hamusuke.standup.invoker;
 
-import com.hamusuke.standup.stand.Stand;
-import com.hamusuke.standup.stand.Stand.StandOperationMode;
+import com.hamusuke.standup.stand.stands.Stand;
+import com.hamusuke.standup.stand.stands.Stand.StandOperationMode;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public interface PlayerInvoker {
@@ -11,6 +12,10 @@ public interface PlayerInvoker {
     void standUp(Stand stand);
 
     void standDown();
+
+    ItemStack getStandCard();
+
+    void setStandCard(ItemStack card);
 
     default StandOperationMode getOpMode() {
         return this.isStandAlive() ? this.getStand().getMode() : StandOperationMode.AI;

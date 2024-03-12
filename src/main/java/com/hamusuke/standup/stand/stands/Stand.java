@@ -1,4 +1,4 @@
-package com.hamusuke.standup.stand;
+package com.hamusuke.standup.stand.stands;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -7,11 +7,10 @@ import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.s2c.HoldOrReleaseStandOwnerNotify;
 import com.hamusuke.standup.network.packet.s2c.StandOperationModeToggleNotify;
+import com.hamusuke.standup.stand.MultipleTarget;
 import com.hamusuke.standup.stand.ai.goal.AutoDoorGoal;
 import com.hamusuke.standup.stand.ai.goal.AutoFenceGateGoal;
 import com.hamusuke.standup.stand.ai.goal.FollowStandOwnerGoal;
-import com.hamusuke.standup.stand.ai.goal.StandRushAttackGoal;
-import com.hamusuke.standup.stand.ai.goal.target.MultipleAttackableTargetsGoal;
 import com.hamusuke.standup.stand.ai.goal.target.StandOwnerHurtTargetGoal;
 import com.hamusuke.standup.util.MthH;
 import net.minecraft.Util;
@@ -21,6 +20,10 @@ import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.network.protocol.game.ClientboundSetCameraPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
@@ -28,13 +31,15 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
@@ -50,10 +55,12 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.hamusuke.standup.registries.RegisteredEntities.STAND_TYPE;
-import static com.hamusuke.standup.registries.RegisteredSoundEvents.PUNCH;
+import static com.hamusuke.standup.registry.RegisteredEntities.SLIM_STAND_TYPE;
+import static com.hamusuke.standup.registry.RegisteredEntities.STAND_TYPE;
+import static com.hamusuke.standup.registry.RegisteredMenus.CARD_MENU;
+import static com.hamusuke.standup.registry.RegisteredSoundEvents.PUNCH;
 
-public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntity, IEntityAdditionalSpawnData {
+public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget, OwnableEntity, IEntityAdditionalSpawnData {
     protected Player cachedOwner;
     protected UUID ownerUUID;
     protected StandOperationMode mode = StandOperationMode.AI;
@@ -61,7 +68,11 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
     protected boolean holdingOwner;
 
     public Stand(Level level, @Nullable Player owner) {
-        this(STAND_TYPE.get(), level, owner);
+        this(false, level, owner);
+    }
+
+    public Stand(boolean slim, Level level, @Nullable Player owner) {
+        this(slim ? SLIM_STAND_TYPE.get() : STAND_TYPE.get(), level, owner);
     }
 
     public Stand(EntityType<? extends Stand> type, Level p_21369_, @Nullable Player owner) {
@@ -85,12 +96,8 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
         return true;
     }
 
-    public boolean isSlim() {
-        return this instanceof SlimStand;
-    }
-
     public double maxMovableDistanceFromPlayer() {
-        return 16.0D;
+        return 32.0D;
     }
 
     public boolean isTooFarAway() {
@@ -131,17 +138,12 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
 
     @Override
     protected void registerGoals() {
-        super.registerGoals();
-
-        this.goalSelector.addGoal(3, new StandRushAttackGoal(this, 10.0D, 2, true));
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, false));
         this.goalSelector.addGoal(5, new AutoDoorGoal(this));
         this.goalSelector.addGoal(5, new AutoFenceGateGoal(this));
         this.goalSelector.addGoal(10, new FollowStandOwnerGoal(this, 5.0D, 2.5F, 0.1F));
 
         this.targetSelector.addGoal(1, new StandOwnerHurtTargetGoal(this));
-        this.targetSelector.addGoal(2, new MultipleAttackableTargetsGoal<>(this, LivingEntity.class, false, livingEntity -> {
-            return this.getOwner() != null && !this.getOwner().isCreative() && livingEntity instanceof Enemy;
-        }));
     }
 
     @Override
@@ -166,7 +168,7 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
     @Override
     public float getFlyingSpeed() {
         var fly = this.getOwner().getAbilities().getFlyingSpeed();
-        return this.isSprinting() ? fly * 2.0F : fly;
+        return this.isSprinting() && this.canSprint() ? fly * 2.0F : fly;
     }
 
     public static AttributeSupplier createAttributes() {
@@ -192,7 +194,9 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
 
         if (!this.isFollowingOwner()) {
             this.setNoGravity(true);
-        } else if (!this.isAggressive()) {
+        }
+
+        if (!this.isAggressive()) {
             this.imitateOwner();
         }
 
@@ -299,6 +303,7 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
     }
 
     protected void followOwnerTick() {
+        this.setPose(this.getOwner().getPose());
         this.hurtTime = this.getOwner().hurtTime;
         this.hurtDuration = this.getOwner().hurtDuration;
         this.fallFlyTicks = this.getOwner().getFallFlyingTicks();
@@ -317,13 +322,15 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
             this.swingingArm = this.getOwner().swingingArm;
             this.attackAnim = this.getOwner().attackAnim;
         }
-
-        this.setPose(this.getOwner().getPose());
     }
 
     public void startHoldingOwner() {
-        if (this.isHoldingOwner() || !this.isControlledByStandOwner()) {
+        if (this.isHoldingOwner() || this.getOwner().isPassenger()) {
             return;
+        }
+
+        if (!this.level().isClientSide && !this.isControlledByStandOwner()) {
+            this.toggleMode(StandOperationMode.OWNER);
         }
 
         this.holdingOwner = true;
@@ -421,7 +428,15 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
             return this.getOwner().getAttributeValue(p_21134_);
         }
 
+        if (p_21134_.equals(Attributes.ATTACK_DAMAGE)) {
+            return this.getAttackDamage();
+        }
+
         return super.getAttributeValue(p_21134_);
+    }
+
+    public double getAttackDamage() {
+        return 2.0D;
     }
 
     @Override
@@ -439,8 +454,6 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
             return false;
         }
 
-        entity.invulnerableTime = 0;
-
         if (entity instanceof LivingEntityInvoker invoker) {
             ((LivingEntity) entity).setLastHurtByPlayer(this.getOwner());
             invoker.setLastHurtByPlayerTime(100);
@@ -452,12 +465,24 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
             invoker.setLastHurtByPlayerTime(0);
         }
 
-        if (this.level() instanceof ServerLevel serverLevel && flag) {
-            serverLevel.playSound(null, this.getX(), this.getY(), this.getZ(), PUNCH.get(), this.getSoundSource(), 0.5F, 1.0F);
+        if (this.level() instanceof ServerLevel serverLevel && flag && this.shouldPlayPunchSound()) {
+            serverLevel.playSound(null, this.getX(), this.getY(), this.getZ(), this.getPunchSound(), this.getSoundSource(), 0.5F, 1.0F);
             serverLevel.getChunkSource().broadcastAndSend(this, new ClientboundAnimatePacket(entity, 4));
         }
 
         return flag;
+    }
+
+    public double getFollowRange() {
+        return 10.0D;
+    }
+
+    public SoundEvent getPunchSound() {
+        return PUNCH.get();
+    }
+
+    public boolean shouldPlayPunchSound() {
+        return true;
     }
 
     @Nullable
@@ -508,7 +533,7 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
         this.mode = mode;
 
         if (!this.level().isClientSide && this.getOwner() instanceof ServerPlayer serverPlayer) {
-            NetworkManager.sendToDimension(new StandOperationModeToggleNotify(this, this.mode), serverPlayer);
+            NetworkManager.sendToClient(new StandOperationModeToggleNotify(this, this.mode), serverPlayer);
             serverPlayer.xxa = 0.0F;
             serverPlayer.yya = 0.0F;
             serverPlayer.zza = 0.0F;
@@ -541,6 +566,10 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
     @OnlyIn(Dist.CLIENT)
     public void setMode(StandOperationMode mode) {
         this.mode = mode;
+
+        if (this.mode == StandOperationMode.AI) {
+            this.getOwner().setDeltaMovement(Vec3.ZERO);
+        }
     }
 
     @Override
@@ -582,22 +611,38 @@ public class Stand extends PathfinderMob implements MultipleTarget, OwnableEntit
     }
 
     @Override
-    public boolean isPickable() {
-        return false;
-    }
-
-    @Override
     public boolean canBeAffected(MobEffectInstance p_21197_) {
         return false;
     }
 
     @Override
-    public boolean canBeHitByProjectile() {
-        return true;
+    public void thunderHit(ServerLevel p_19927_, LightningBolt p_19928_) {
     }
 
     @Override
-    public void thunderHit(ServerLevel p_19927_, LightningBolt p_19928_) {
+    public boolean isPickable() {
+        return false;
+    }
+
+    @Override
+    public boolean skipAttackInteraction(Entity p_20357_) {
+        return p_20357_ instanceof Player player && player == this.getOwner();
+    }
+
+    @Override
+    public InteractionResult interactAt(Player p_19980_, Vec3 p_19981_, InteractionHand p_19982_) {
+        if (p_19980_ != this.getOwner()) {
+            return InteractionResult.PASS;
+        }
+
+        p_19980_.openMenu(this);
+        return InteractionResult.sidedSuccess(this.level().isClientSide);
+    }
+
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        return this.getOwner() == player ? CARD_MENU.get().create(i, inventory) : null;
     }
 
     @Override

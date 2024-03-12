@@ -3,53 +3,71 @@ package com.hamusuke.standup;
 import com.google.common.collect.Sets;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
-import com.hamusuke.standup.registries.RegisteredCreativeModeTabs;
-import com.hamusuke.standup.registries.RegisteredEntities;
-import com.hamusuke.standup.registries.RegisteredItems;
-import com.hamusuke.standup.registries.RegisteredSoundEvents;
-import com.hamusuke.standup.stand.Stand;
-import com.hamusuke.standup.stand.Stand.StandOperationMode;
+import com.hamusuke.standup.registry.*;
+import com.hamusuke.standup.stand.ability.StandCard;
+import com.hamusuke.standup.stand.stands.Stand;
+import com.hamusuke.standup.stand.stands.Stand.StandOperationMode;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.NewRegistryEvent;
+import net.minecraftforge.registries.RegistryBuilder;
 
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Mod(StandUp.MOD_ID)
 public class StandUp {
     public static final String MOD_ID = "standup";
+    public static final ResourceLocation STAND_CARD_REGISTRY_KEY = new ResourceLocation(MOD_ID, "stand_ability");
     private static final Set<Consumer<IEventBus>> REGISTRIES = Sets.newHashSet(
             RegisteredCreativeModeTabs.CREATIVE_MODE_TABS::register,
             RegisteredEntities.ENTITY_TYPES::register,
             RegisteredItems.ITEMS::register,
-            RegisteredSoundEvents.SOUND_EVENTS::register
+            RegisteredMenus.MENU_TYPES::register,
+            RegisteredSoundEvents.SOUND_EVENTS::register,
+            RegisteredStandCards.STAND_CARDS::register
     );
+    private static Supplier<IForgeRegistry<StandCard>> reg = () -> null;
 
     public StandUp() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        StandCardLoader.getInstance().getStandCards().forEach(card -> RegisteredStandCards.STAND_CARDS.register(card.getId(), () -> card));
+
         REGISTRIES.forEach(act -> act.accept(modEventBus));
 
+        modEventBus.addListener(this::newRegistry);
         modEventBus.addListener(this::commonSetup);
 
         MinecraftForge.EVENT_BUS.register(this);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        ModLoadingContext.get().registerConfig(Type.COMMON, CommonConfig.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         NetworkManager.registerPackets();
+    }
+
+    public static Supplier<IForgeRegistry<StandCard>> getReg() {
+        return reg;
+    }
+
+    private void newRegistry(final NewRegistryEvent event) {
+        reg = event.create(RegistryBuilder.of(STAND_CARD_REGISTRY_KEY));
     }
 
     @SubscribeEvent
@@ -81,6 +99,13 @@ public class StandUp {
     public void onPlayerLoggedOut(final PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof PlayerInvoker invoker && invoker.isControllingStand() && invoker.getStand().isHoldingOwner()) {
             invoker.getStand().stopHoldingOwner();
+        }
+    }
+
+    @SubscribeEvent
+    public void onLivingFall(final LivingFallEvent event) {
+        if (event.getEntity() instanceof PlayerInvoker invoker && invoker.isControllingStand()) {
+            event.setCanceled(true);
         }
     }
 }

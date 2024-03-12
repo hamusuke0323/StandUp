@@ -1,8 +1,8 @@
 package com.hamusuke.standup.network.packet.s2c;
 
-import com.hamusuke.standup.stand.Stand;
-import com.hamusuke.standup.stand.Stand.StandOperationMode;
 import com.hamusuke.standup.network.packet.Packet;
+import com.hamusuke.standup.stand.stands.Stand;
+import com.hamusuke.standup.stand.stands.Stand.StandOperationMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;

@@ -3,15 +3,21 @@ package com.hamusuke.standup.mixin;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static com.hamusuke.standup.registry.RegisteredItems.STAND_CARD;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements PlayerInvoker {
@@ -50,5 +56,24 @@ public abstract class ServerPlayerMixin extends Player implements PlayerInvoker 
         }
 
         return instance.stillValid(player);
+    }
+
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    private void save(CompoundTag p_9197_, CallbackInfo ci) {
+        if (!this.getStandCard().isEmpty()) {
+            var card = new CompoundTag();
+            this.getStandCard().save(card);
+            p_9197_.put("StandCard", card);
+        }
+    }
+
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    private void load(CompoundTag p_9131_, CallbackInfo ci) {
+        if (p_9131_.get("StandCard") instanceof CompoundTag compoundTag) {
+            var stack = ItemStack.of(compoundTag);
+            if (stack.is(STAND_CARD.get())) {
+                this.setStandCard(stack);
+            }
+        }
     }
 }

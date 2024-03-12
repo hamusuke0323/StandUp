@@ -72,6 +72,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
             this.jumping = false;
             this.getStand().xxa = this.input.leftImpulse;
             this.getStand().zza = this.input.forwardImpulse;
+            this.fallDistance = 0.0F;
 
             if (this.getStand().isTooFarAway()) {
                 double scale = this.getStand().position().distanceTo(this.position()) - this.getStand().maxMovableDistanceFromPlayer();
@@ -94,7 +95,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
             double yd = this.getYRot() - this.yRotLast;
             double xd = this.getXRot() - this.xRotLast;
             if (yd != 0.0D || xd != 0.0D) {
-                this.connection.send(new Rot(this.getStand().getYRot(), this.getStand().getXRot(), this.onGround()));
+                this.connection.send(new Rot(this.getStand().getYRot(), this.getStand().getXRot(), true));
             }
 
             NetworkManager.sendToServer(new SyncStandPosRotReq(this.getStand().position(), this.getStand().getYRot(), this.getStand().getXRot(), this.isSprinting()));
