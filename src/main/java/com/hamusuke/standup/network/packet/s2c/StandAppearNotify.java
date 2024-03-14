@@ -9,18 +9,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import net.minecraftforge.fml.DistExecutor;
 
-public class StandAppearNotify implements Packet {
-    private final int standOwnerId;
-    private final int standId;
-
-    public StandAppearNotify(int standOwnerId, int standId) {
-        this.standOwnerId = standOwnerId;
-        this.standId = standId;
-    }
-
+public record StandAppearNotify(int standOwnerId, int standId) implements Packet {
     public StandAppearNotify(FriendlyByteBuf buf) {
-        this.standOwnerId = buf.readVarInt();
-        this.standId = buf.readVarInt();
+        this(buf.readVarInt(), buf.readVarInt());
     }
 
     @Override

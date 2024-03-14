@@ -74,6 +74,22 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
             this.getStand().zza = this.input.forwardImpulse;
             this.fallDistance = 0.0F;
 
+            if (this.isControllingStand()) {
+                this.yya = 0.0F;
+                int j = 0;
+                if (this.isShiftKeyDown()) {
+                    --j;
+                }
+
+                if (this.input.jumping) {
+                    ++j;
+                }
+
+                if (j != 0) {
+                    this.getStand().setDeltaMovement(this.getStand().getDeltaMovement().add(0.0D, j * this.getStand().getFlyingSpeed(), 0.0D));
+                }
+            }
+
             if (this.getStand().isTooFarAway()) {
                 double scale = this.getStand().position().distanceTo(this.position()) - this.getStand().maxMovableDistanceFromPlayer();
                 scale *= SQRT_OF_THREE;
@@ -89,13 +105,15 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
         }
     }
 
-    @Inject(method = "sendPosition", at = @At("TAIL"))
+    @Inject(method = "sendPosition", at = @At("HEAD"), cancellable = true)
     private void sendPosition(CallbackInfo ci) {
         if (this.isControllingStand()) {
             double yd = this.getYRot() - this.yRotLast;
             double xd = this.getXRot() - this.xRotLast;
             if (yd != 0.0D || xd != 0.0D) {
                 this.connection.send(new Rot(this.getStand().getYRot(), this.getStand().getXRot(), true));
+                this.yRotLast = this.getYRot();
+                this.xRotLast = this.getXRot();
             }
 
             NetworkManager.sendToServer(new SyncStandPosRotReq(this.getStand().position(), this.getStand().getYRot(), this.getStand().getXRot(), this.isSprinting()));

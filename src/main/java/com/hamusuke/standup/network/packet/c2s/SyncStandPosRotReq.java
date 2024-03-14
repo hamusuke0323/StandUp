@@ -6,24 +6,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 
-public class SyncStandPosRotReq implements Packet {
-    private final Vec3 pos;
-    private final float yRot;
-    private final float xRot;
-    private final boolean sprinting;
-
-    public SyncStandPosRotReq(Vec3 pos, float yRot, float xRot, boolean sprinting) {
-        this.pos = pos;
-        this.yRot = yRot;
-        this.xRot = xRot;
-        this.sprinting = sprinting;
-    }
-
+public record SyncStandPosRotReq(Vec3 pos, float yRot, float xRot, boolean sprinting) implements Packet {
     public SyncStandPosRotReq(FriendlyByteBuf buf) {
-        this.pos = buf.readVec3();
-        this.yRot = buf.readFloat();
-        this.xRot = buf.readFloat();
-        this.sprinting = buf.readBoolean();
+        this(buf.readVec3(), buf.readFloat(), buf.readFloat(), buf.readBoolean());
     }
 
     @Override

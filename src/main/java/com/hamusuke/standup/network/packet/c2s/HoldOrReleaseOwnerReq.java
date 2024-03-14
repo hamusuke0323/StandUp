@@ -4,7 +4,7 @@ import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.packet.Packet;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 
-public class HoldOrReleaseOwnerReq implements Packet {
+public record HoldOrReleaseOwnerReq() implements Packet {
     @Override
     public boolean handle(Context context) {
         context.enqueueWork(() -> {

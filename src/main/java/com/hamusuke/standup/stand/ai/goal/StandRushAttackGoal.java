@@ -14,7 +14,6 @@ import java.util.EnumSet;
 
 public class StandRushAttackGoal extends Goal {
     protected final Stand stand;
-    private final double speedModifier;
     private final boolean followingTargetEvenIfNotSeen;
     private Path path;
     private double pathedTargetX;
@@ -23,14 +22,12 @@ public class StandRushAttackGoal extends Goal {
     private int ticksUntilNextPathRecalculation;
     protected int ticksUntilNextAttack;
     protected int attackInterval;
-    private long lastCanUseCheck;
     private int failedPathFindingPenalty = 0;
     private final boolean canPenalize = false;
     private InteractionHand lastPunchedHand = InteractionHand.OFF_HAND;
 
-    public StandRushAttackGoal(Stand stand, double speed, int attackInterval, boolean followingTargetEvenIfNotSeen) {
+    public StandRushAttackGoal(Stand stand, int attackInterval, boolean followingTargetEvenIfNotSeen) {
         this.stand = stand;
-        this.speedModifier = speed;
         this.attackInterval = attackInterval;
         this.followingTargetEvenIfNotSeen = followingTargetEvenIfNotSeen;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));

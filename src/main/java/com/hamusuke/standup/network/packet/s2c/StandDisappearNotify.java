@@ -8,15 +8,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import net.minecraftforge.fml.DistExecutor;
 
-public class StandDisappearNotify implements Packet {
-    private final int ownerId;
-
-    public StandDisappearNotify(int ownerId) {
-        this.ownerId = ownerId;
-    }
-
+public record StandDisappearNotify(int ownerId) implements Packet {
     public StandDisappearNotify(FriendlyByteBuf buf) {
-        this.ownerId = buf.readVarInt();
+        this(buf.readVarInt());
     }
 
     @Override

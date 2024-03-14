@@ -3,20 +3,15 @@ package com.hamusuke.standup.network.packet.c2s;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.packet.Packet;
 import com.hamusuke.standup.stand.stands.Stand;
+import com.hamusuke.standup.util.MthH;
 import com.hamusuke.standup.world.item.StandCardItem;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 
-public class StandUpReq implements Packet {
-    private final boolean slim;
-
-    public StandUpReq(boolean slim) {
-        this.slim = slim;
-    }
-
+public record StandUpReq(boolean slim) implements Packet {
     public StandUpReq(FriendlyByteBuf buf) {
-        this.slim = buf.readBoolean();
+        this(buf.readBoolean());
     }
 
     @Override
@@ -42,7 +37,8 @@ public class StandUpReq implements Packet {
 
             var ability = StandCardItem.getStandCardFrom(invoker.getStandCard());
             var stand = ability.createStand(sender.level(), sender, this.slim);
-            stand.setPos(sender.getEyePosition().add(0.1D, 0.02D, 0.1D));
+            var vec = MthH.behindVector(sender);
+            stand.setPos(sender.position().add(vec.scale(0.5D)));
             sender.level().addFreshEntity(stand);
         });
 

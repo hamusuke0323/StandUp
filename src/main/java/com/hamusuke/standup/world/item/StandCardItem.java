@@ -1,10 +1,8 @@
 package com.hamusuke.standup.world.item;
 
-import com.hamusuke.standup.StandUp;
 import com.hamusuke.standup.stand.ability.StandCard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -28,13 +26,8 @@ public class StandCardItem extends Item {
         super(new Properties().fireResistant().rarity(Rarity.EPIC).stacksTo(1).setNoRepair());
     }
 
-    @Nullable
-    public static ResourceLocation getStandCardId(StandCard standCard) {
-        return StandUp.getReg().get().getKey(standCard);
-    }
-
     public static void setStandCard(ItemStack stack, StandCard standCard) {
-        var key = getStandCardId(standCard);
+        var key = standCard.getCardId();
         if (key != null) {
             stack.getOrCreateTag().putString("id", key.toString());
         }
@@ -48,13 +41,7 @@ public class StandCardItem extends Item {
 
     public static StandCard getStandCardFrom(ItemStack stack) {
         var s = stack.getOrCreateTag().getString("id");
-        var id = ResourceLocation.tryParse(s);
-        if (id != null) {
-            var card = StandUp.getReg().get().getValue(id);
-            return card == null ? StandCard.EMPTY : card;
-        }
-
-        return StandCard.EMPTY;
+        return StandCard.getCard(s);
     }
 
     @Override

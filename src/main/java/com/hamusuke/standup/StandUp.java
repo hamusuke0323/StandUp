@@ -1,25 +1,27 @@
 package com.hamusuke.standup;
 
 import com.google.common.collect.Sets;
+import com.hamusuke.standup.config.Config;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
+import com.hamusuke.standup.network.packet.s2c.StandCardSetNotify;
 import com.hamusuke.standup.registry.*;
 import com.hamusuke.standup.stand.ability.StandCard;
 import com.hamusuke.standup.stand.stands.Stand;
 import com.hamusuke.standup.stand.stands.Stand.StandOperationMode;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -55,7 +57,7 @@ public class StandUp {
         modEventBus.addListener(this::commonSetup);
 
         MinecraftForge.EVENT_BUS.register(this);
-        ModLoadingContext.get().registerConfig(Type.COMMON, CommonConfig.SPEC);
+        Config.registerConfigs();
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -106,6 +108,13 @@ public class StandUp {
     public void onLivingFall(final LivingFallEvent event) {
         if (event.getEntity() instanceof PlayerInvoker invoker && invoker.isControllingStand()) {
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerLoggedIn(final PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            NetworkManager.sendToClient(new StandCardSetNotify(serverPlayer.getId(), ((PlayerInvoker) serverPlayer).getStandCard(), false), serverPlayer);
         }
     }
 }

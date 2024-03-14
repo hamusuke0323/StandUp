@@ -9,18 +9,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import net.minecraftforge.fml.DistExecutor;
 
-public class StandOperationModeToggleNotify implements Packet {
-    private final int standId;
-    private final StandOperationMode mode;
-
+public record StandOperationModeToggleNotify(int standId, StandOperationMode mode) implements Packet {
     public StandOperationModeToggleNotify(Stand stand, StandOperationMode mode) {
-        this.standId = stand.getId();
-        this.mode = mode;
+        this(stand.getId(), mode);
     }
 
     public StandOperationModeToggleNotify(FriendlyByteBuf buf) {
-        this.standId = buf.readVarInt();
-        this.mode = buf.readEnum(StandOperationMode.class);
+        this(buf.readVarInt(), buf.readEnum(StandOperationMode.class));
     }
 
     @Override

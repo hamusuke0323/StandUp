@@ -14,6 +14,6 @@ public class StarPlatinumCard extends StandCard {
 
     @Override
     public Stand createStand(Level level, Player owner, boolean slim) {
-        return new StarPlatinum(slim, level, owner);
+        return new StarPlatinum(level, owner, slim, this);
     }
 }

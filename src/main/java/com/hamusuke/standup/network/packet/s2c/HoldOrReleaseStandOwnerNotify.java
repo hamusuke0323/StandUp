@@ -8,18 +8,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import net.minecraftforge.fml.DistExecutor;
 
-public class HoldOrReleaseStandOwnerNotify implements Packet {
-    private final int standId;
-    private final boolean hold;
-
+public record HoldOrReleaseStandOwnerNotify(int standId, boolean hold) implements Packet {
     public HoldOrReleaseStandOwnerNotify(Stand stand, boolean hold) {
-        this.standId = stand.getId();
-        this.hold = hold;
+        this(stand.getId(), hold);
     }
 
     public HoldOrReleaseStandOwnerNotify(FriendlyByteBuf buf) {
-        this.standId = buf.readVarInt();
-        this.hold = buf.readBoolean();
+        this(buf.readVarInt(), buf.readBoolean());
     }
 
     @Override

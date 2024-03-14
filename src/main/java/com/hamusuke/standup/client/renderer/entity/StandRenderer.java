@@ -4,6 +4,7 @@ import com.hamusuke.standup.client.model.StandModel;
 import com.hamusuke.standup.stand.stands.Stand;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel.ArmPose;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -34,6 +35,11 @@ public class StandRenderer extends HumanoidMobRenderer<Stand, StandModel> {
     public void render(Stand stand, float p_115456_, float partialTicks, PoseStack poseStack, MultiBufferSource source, int i) {
         this.setModelProperties(stand);
         super.render(stand, p_115456_, partialTicks, poseStack, source, i);
+    }
+
+    @Override
+    protected boolean isBodyVisible(Stand p_115341_) {
+        return !p_115341_.isInvisibleTo(Minecraft.getInstance().player);
     }
 
     private void setModelProperties(Stand stand) {

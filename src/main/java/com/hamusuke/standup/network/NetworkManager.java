@@ -51,18 +51,10 @@ public final class NetworkManager {
     }
 
     public static void sendToClient(Packet packet, ServerPlayer serverPlayer) {
-        if (serverPlayer.connection == null) {
+        if (serverPlayer == null || serverPlayer.connection == null) {
             return;
         }
 
         MAIN.send(packet, serverPlayer.connection.getConnection());
     }
-
-//    public static void sendToAll(Packet packet, ServerPlayer serverPlayer) {
-//        MAIN.send(packet, new PacketTarget(packet1 -> serverPlayer.getServer().getPlayerList().broadcastAll(packet1), NetworkDirection.PLAY_TO_CLIENT));
-//    }
-//
-//    public static void sendToAllInTheSameDimension(Packet packet, ServerPlayer serverPlayer) {
-//        MAIN.send(packet, new PacketTarget(packet1 -> serverPlayer.getServer().getPlayerList().broadcastAll(packet1, serverPlayer.serverLevel().dimension()), NetworkDirection.PLAY_TO_CLIENT));
-//    }
 }

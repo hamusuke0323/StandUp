@@ -4,7 +4,7 @@ import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.packet.Packet;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 
-public class StandDownReq implements Packet {
+public record StandDownReq() implements Packet {
     @Override
     public boolean handle(Context context) {
         context.enqueueWork(() -> {

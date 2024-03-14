@@ -5,6 +5,8 @@ import com.hamusuke.standup.stand.stands.Stand.StandOperationMode;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import static com.hamusuke.standup.registry.RegisteredItems.STAND_CARD;
+
 public interface PlayerInvoker {
     @Nullable
     Stand getStand();
@@ -19,6 +21,10 @@ public interface PlayerInvoker {
 
     default StandOperationMode getOpMode() {
         return this.isStandAlive() ? this.getStand().getMode() : StandOperationMode.AI;
+    }
+
+    default boolean hasStandAbility() {
+        return this.getStandCard().is(STAND_CARD.get());
     }
 
     default boolean isControllingStand() {

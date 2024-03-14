@@ -1,6 +1,8 @@
 package com.hamusuke.standup.client.gui.screen;
 
-import com.hamusuke.standup.CommonConfig;
+import com.hamusuke.standup.config.ClientConfig;
+import com.hamusuke.standup.config.CommonConfig;
+import com.hamusuke.standup.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
@@ -19,6 +21,8 @@ public class ConfigScreen extends Screen {
     private static final Component STAND_CAN_OPEN_GATE = Component.translatable(MOD_ID + ".config.canOpenGate");
     private static final Component SET_STAND_CARD_MSG = Component.translatable(MOD_ID + ".config.setStandCardMsg");
     private final Screen parent;
+    private final CommonConfig commonConfig = Config.getCommonConfig();
+    private final ClientConfig clientConfig = Config.getClientConfig();
 
     public ConfigScreen(Minecraft ignored, Screen parent) {
         super(TITLE);
@@ -29,14 +33,14 @@ public class ConfigScreen extends Screen {
     protected void init() {
         super.init();
 
-        this.addRenderableWidget(CycleButton.booleanBuilder(CommonComponents.GUI_YES, CommonComponents.GUI_NO).withInitialValue(CommonConfig.standCanOpenDoor).create(this.width / 4, this.height / 2 - 30, this.width / 2, 20, STAND_CAN_OPEN_DOOR, (cycleButton, aBoolean) -> {
-            CommonConfig.standCanOpenDoor = aBoolean;
+        this.addRenderableWidget(CycleButton.booleanBuilder(CommonComponents.GUI_YES, CommonComponents.GUI_NO).withInitialValue(this.commonConfig.standCanOpenDoor.get()).create(this.width / 4, this.height / 2 - 30, this.width / 2, 20, STAND_CAN_OPEN_DOOR, (cycleButton, aBoolean) -> {
+            this.commonConfig.standCanOpenDoor.set(aBoolean);
         }));
-        this.addRenderableWidget(CycleButton.booleanBuilder(CommonComponents.GUI_YES, CommonComponents.GUI_NO).withInitialValue(CommonConfig.standCanOpenGate).create(this.width / 4, this.height / 2 - 10, this.width / 2, 20, STAND_CAN_OPEN_GATE, (cycleButton, aBoolean) -> {
-            CommonConfig.standCanOpenGate = aBoolean;
+        this.addRenderableWidget(CycleButton.booleanBuilder(CommonComponents.GUI_YES, CommonComponents.GUI_NO).withInitialValue(this.commonConfig.standCanOpenGate.get()).create(this.width / 4, this.height / 2 - 10, this.width / 2, 20, STAND_CAN_OPEN_GATE, (cycleButton, aBoolean) -> {
+            this.commonConfig.standCanOpenGate.set(aBoolean);
         }));
-        this.addRenderableWidget(CycleButton.booleanBuilder(CommonComponents.GUI_YES, CommonComponents.GUI_NO).withInitialValue(CommonConfig.setStandCardMsg).create(this.width / 4, this.height / 2 + 10, this.width / 2, 20, SET_STAND_CARD_MSG, (cycleButton, aBoolean) -> {
-            CommonConfig.setStandCardMsg = aBoolean;
+        this.addRenderableWidget(CycleButton.booleanBuilder(CommonComponents.GUI_YES, CommonComponents.GUI_NO).withInitialValue(this.clientConfig.setStandCardMsg.get()).create(this.width / 4, this.height / 2 + 10, this.width / 2, 20, SET_STAND_CARD_MSG, (cycleButton, aBoolean) -> {
+            this.clientConfig.setStandCardMsg.set(aBoolean);
         }));
 
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).bounds(this.width / 4, this.height - 20, this.width / 2, 20).build());
@@ -44,7 +48,7 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void removed() {
-        CommonConfig.save();
+        Config.save();
     }
 
     @Override

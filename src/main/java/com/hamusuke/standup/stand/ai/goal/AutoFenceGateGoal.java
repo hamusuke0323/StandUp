@@ -1,6 +1,6 @@
 package com.hamusuke.standup.stand.ai.goal;
 
-import com.hamusuke.standup.CommonConfig;
+import com.hamusuke.standup.config.Config;
 import com.hamusuke.standup.invoker.FenceGateBlockInvoker;
 import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.core.BlockPos;
@@ -36,7 +36,7 @@ public class AutoFenceGateGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return CommonConfig.standCanOpenGate && !this.stand.isAggressive() && this.isInFrontOfGate();
+        return Config.getCommonConfig().standCanOpenGate.get() && !this.stand.isAggressive() && this.isInFrontOfGate();
     }
 
     @Override
@@ -127,7 +127,7 @@ public class AutoFenceGateGoal extends Goal {
         }
 
         protected void openOrClose() {
-            if (this.hasGate && CommonConfig.standCanOpenGate) {
+            if (this.hasGate && Config.getCommonConfig().standCanOpenGate.get()) {
                 var blockState = AutoFenceGateGoal.this.stand.level().getBlockState(this.gatePos);
                 if (blockState.getBlock() instanceof FenceGateBlockInvoker gate) {
                     if (this.isOpen()) {

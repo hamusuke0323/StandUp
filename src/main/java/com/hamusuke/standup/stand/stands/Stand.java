@@ -8,16 +8,18 @@ import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.s2c.HoldOrReleaseStandOwnerNotify;
 import com.hamusuke.standup.network.packet.s2c.StandOperationModeToggleNotify;
 import com.hamusuke.standup.stand.MultipleTarget;
+import com.hamusuke.standup.stand.ability.StandCard;
 import com.hamusuke.standup.stand.ai.goal.AutoDoorGoal;
 import com.hamusuke.standup.stand.ai.goal.AutoFenceGateGoal;
 import com.hamusuke.standup.stand.ai.goal.FollowStandOwnerGoal;
-import com.hamusuke.standup.stand.ai.goal.target.StandOwnerHurtTargetGoal;
 import com.hamusuke.standup.util.MthH;
 import net.minecraft.Util;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.network.protocol.game.ClientboundSetCameraPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -31,7 +33,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -49,6 +50,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -61,24 +63,20 @@ import static com.hamusuke.standup.registry.RegisteredMenus.CARD_MENU;
 import static com.hamusuke.standup.registry.RegisteredSoundEvents.PUNCH;
 
 public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget, OwnableEntity, IEntityAdditionalSpawnData {
-    protected Player cachedOwner;
-    protected UUID ownerUUID;
+    protected final Player owner;
+    protected final ResourceLocation standCardId;
     protected StandOperationMode mode = StandOperationMode.AI;
     protected final Set<LivingEntity> targets = Sets.newHashSet();
     protected boolean holdingOwner;
 
-    public Stand(Level level, @Nullable Player owner) {
-        this(false, level, owner);
+    public Stand(Level level, Player owner, boolean slim, StandCard standCardId) {
+        this(slim ? SLIM_STAND_TYPE.get() : STAND_TYPE.get(), level, owner, standCardId);
     }
 
-    public Stand(boolean slim, Level level, @Nullable Player owner) {
-        this(slim ? SLIM_STAND_TYPE.get() : STAND_TYPE.get(), level, owner);
-    }
-
-    public Stand(EntityType<? extends Stand> type, Level p_21369_, @Nullable Player owner) {
+    public Stand(EntityType<? extends Stand> type, Level p_21369_, Player owner, StandCard standCardId) {
         super(type, p_21369_);
-        this.cachedOwner = owner;
-        this.ownerUUID = owner == null ? null : owner.getUUID();
+        this.owner = owner;
+        this.standCardId = standCardId.getCardId();
         this.moveControl = new FlyingMoveControl(this, 0, true) {
             @Override
             public void tick() {
@@ -101,7 +99,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     }
 
     public boolean isTooFarAway() {
-        return this.getOwner() != null && !this.getOwner().position().closerThan(this.position(), this.maxMovableDistanceFromPlayer());
+        return !this.getOwner().position().closerThan(this.position(), this.maxMovableDistanceFromPlayer());
     }
 
     @Override
@@ -138,12 +136,9 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, false));
         this.goalSelector.addGoal(5, new AutoDoorGoal(this));
         this.goalSelector.addGoal(5, new AutoFenceGateGoal(this));
         this.goalSelector.addGoal(10, new FollowStandOwnerGoal(this, 5.0D, 2.5F, 0.1F));
-
-        this.targetSelector.addGoal(1, new StandOwnerHurtTargetGoal(this));
     }
 
     @Override
@@ -153,11 +148,6 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         }
 
         return super.equals(p_20245_);
-    }
-
-    @Override
-    public boolean isAlive() {
-        return this.getOwner() != null && super.isAlive();
     }
 
     @Override
@@ -182,7 +172,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     public void tick() {
-        if (this.getOwner() == null || !this.getOwner().isAlive() || this.getOwner().isSpectator()) {
+        if (!this.getOwner().isAlive() || this.getOwner().isSpectator()) {
             this.remove(RemovalReason.DISCARDED);
         }
 
@@ -224,36 +214,20 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         for (var entity : list) {
             if (entity.getType() == EntityType.EXPERIENCE_ORB) {
                 list1.add(entity);
-            } else if (!entity.isRemoved() && this.getOwner() != null) {
+            } else if (!entity.isRemoved()) {
                 entity.playerTouch(this.getOwner());
             }
         }
 
-        if (!list1.isEmpty() && this.getOwner() != null) {
+        if (!list1.isEmpty()) {
             Util.getRandom(list1, this.random).playerTouch(this.getOwner());
-        }
-
-        if (this.isControlledByStandOwner()) {
-            this.yya = 0.0F;
-            int j = 0;
-            if (this.isShiftKeyDown()) {
-                --j;
-            }
-
-            if (this.jumping) {
-                ++j;
-            }
-
-            if (j != 0) {
-                this.setDeltaMovement(this.getDeltaMovement().add(0.0D, j * this.getFlyingSpeed(), 0.0D));
-            }
         }
     }
 
     @Nullable
     @Override
     public PlayerTeam getTeam() {
-        return this.getOwner() == null ? super.getTeam() : this.getOwner().getTeam();
+        return this.getOwner().getTeam();
     }
 
     @Override
@@ -263,7 +237,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     public boolean canPickUpLoot() {
-        return this.isAlive() && this.getOwner() != null;
+        return this.isAlive();
     }
 
     @Override
@@ -299,7 +273,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     public boolean isControlledByLocalInstance() {
-        return this.isControlledByStandOwner() || super.isControlledByLocalInstance();
+        return (this.getOwner() instanceof LocalPlayer && this.isControlledByStandOwner()) || super.isControlledByLocalInstance();
     }
 
     protected void followOwnerTick() {
@@ -339,6 +313,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
         var pos = this.getOwner().position();
         this.absMoveTo(pos.x, pos.y, pos.z);
+        this.setDeltaMovement(Vec3.ZERO);
     }
 
     public void stopHoldingOwner() {
@@ -392,7 +367,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     }
 
     public boolean isFollowingOwner() {
-        return this.getOwner() != null && this.mode == StandOperationMode.AI;
+        return this.mode == StandOperationMode.AI;
     }
 
     @Override
@@ -445,7 +420,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     }
 
     public boolean isControlledByStandOwner() {
-        return this.getOwner() != null && this.mode == StandOperationMode.OWNER;
+        return this.mode == StandOperationMode.OWNER;
     }
 
     @Override
@@ -485,16 +460,16 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         return true;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public UUID getOwnerUUID() {
-        return this.ownerUUID;
+        return this.owner.getUUID();
     }
 
-    @Nullable
+    @NotNull
     @Override
     public Player getOwner() {
-        return this.cachedOwner != null ? this.cachedOwner : (this.cachedOwner = (Player) OwnableEntity.super.getOwner());
+        return this.owner;
     }
 
     @Override
@@ -509,7 +484,11 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     public boolean isInvisibleTo(Player p_20178_) {
-        return this.getOwner() != p_20178_ || super.isInvisibleTo(p_20178_);
+        if (p_20178_ instanceof PlayerInvoker invoker && p_20178_ != this.getOwner()) {
+            return !invoker.hasStandAbility();
+        }
+
+        return false;
     }
 
     @Override
@@ -647,12 +626,12 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     public void writeSpawnData(FriendlyByteBuf friendlyByteBuf) {
-        friendlyByteBuf.writeUUID(this.ownerUUID);
+        friendlyByteBuf.writeUUID(this.getOwnerUUID());
+        friendlyByteBuf.writeResourceLocation(this.standCardId);
     }
 
     @Override
     public void readSpawnData(FriendlyByteBuf friendlyByteBuf) {
-        this.ownerUUID = friendlyByteBuf.readUUID();
     }
 
     @Override

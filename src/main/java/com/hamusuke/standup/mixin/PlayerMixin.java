@@ -79,9 +79,10 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
 
     @Override
     public void setStandCard(ItemStack standCard) {
+        var old = this.standCard;
         this.standCard = standCard == null || !standCard.is(STAND_CARD.get()) ? ItemStack.EMPTY : standCard;
 
-        if (!this.level().isClientSide) {
+        if (!old.getOrCreateTag().equals(this.standCard.getOrCreateTag()) && !this.level().isClientSide) {
             NetworkManager.sendToClient(new StandCardSetNotify((Player) (Object) this, this.standCard), (ServerPlayer) (Object) this);
         }
     }

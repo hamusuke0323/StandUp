@@ -9,35 +9,30 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-public class StarPlatinum extends Stand {
-    public StarPlatinum(Level level, Player owner, boolean slim, StandCard card) {
-        super(level, owner, slim, card);
-    }
-
-    @Override
-    public double maxMovableDistanceFromPlayer() {
-        return 5.0D;
+public class KillerQueen extends Stand {
+    public KillerQueen(Level level, Player owner, boolean slim, StandCard standCardId) {
+        super(level, owner, slim, standCardId);
     }
 
     @Override
     protected void registerGoals() {
         super.registerGoals();
 
-        this.goalSelector.addGoal(3, new StandRushAttackGoal(this, 2, true));
+        this.goalSelector.addGoal(3, new StandRushAttackGoal(this, 3, true));
 
         this.targetSelector.addGoal(1, new StandOwnerHurtTargetGoal(this));
         this.targetSelector.addGoal(2, new StandMultipleAttackableTargetsGoal<>(this, LivingEntity.class, false, livingEntity -> {
-            return this.getOwner() != null && !this.getOwner().isCreative() && livingEntity instanceof Enemy;
+            return !this.getOwner().isCreative() && livingEntity instanceof Enemy;
         }));
     }
 
     @Override
-    public double getFollowRange() {
-        return 5.0D;
+    public double maxMovableDistanceFromPlayer() {
+        return 8.0D;
     }
 
     @Override
-    public double getAttackDamage() {
-        return 5.0D;
+    public double getFollowRange() {
+        return 8.0D;
     }
 }

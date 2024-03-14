@@ -1,9 +1,12 @@
 package com.hamusuke.standup.stand.ability;
 
+import com.hamusuke.standup.StandUp;
 import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import static com.hamusuke.standup.StandUp.MOD_ID;
 
@@ -14,6 +17,24 @@ public abstract class StandCard {
             return "";
         }
     };
+
+    public static StandCard getCard(@Nullable ResourceLocation location) {
+        if (location == null) {
+            return EMPTY;
+        }
+
+        var card = StandUp.getReg().get().getValue(location);
+        return card == null ? EMPTY : card;
+    }
+
+    public static StandCard getCard(String id) {
+        return getCard(ResourceLocation.tryParse(id));
+    }
+
+    public ResourceLocation getCardId() {
+        var location = StandUp.getReg().get().getKey(this);
+        return location == null ? ResourceLocation.tryParse(this.getId()) : location;
+    }
 
     public abstract String getId();
 
@@ -26,6 +47,6 @@ public abstract class StandCard {
     }
 
     public Stand createStand(Level level, Player owner, boolean slim) {
-        return new Stand(slim, level, owner);
+        return new Stand(level, owner, slim, this);
     }
 }
