@@ -2,8 +2,6 @@ package com.hamusuke.standup.stand.ability.deadly_queen;
 
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level.ExplosionInteraction;
 import net.minecraft.world.phys.AABB;
 
 public class BlockBomb extends Bomb {
@@ -32,33 +30,20 @@ public class BlockBomb extends Bomb {
     }
 
     @Override
-    public void tick() {
-        if (this.explodeWhen == When.PUSH_SWITCH) {
-            return;
-        }
-
-        var touchingEntities = this.level.getEntitiesOfClass(Entity.class, this.createAABB(), entity -> entity != this.stand && entity != this.stand.getOwner());
-        if (!touchingEntities.isEmpty()) {
-            this.explode();
-        }
-    }
-
-    @Override
     protected void explodeSelf() {
-        var center = this.blockPos.getCenter();
-        this.level.explode(this.stand, center.x, center.y, center.z, 1.0F, false, ExplosionInteraction.NONE);
+        var vec = this.blockPos.getCenter();
+        this.level.explode(null, this.getSource(), this.createDamageCalculator(), vec.x(), vec.y(), vec.z(), this.getRadius(), this.fire(), this.getInteraction(), this.shouldAddParticle(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
     }
 
     @Override
     protected void explodeTouchingEntity() {
-        this.level.getEntitiesOfClass(Entity.class, this.createAABB(), entity -> {
-            return entity != this.stand && entity != this.stand.getOwner();
-        }).forEach(entity -> {
-            this.level.explode(entity, entity.getX(), entity.getY(), entity.getZ(), 1.0F, ExplosionInteraction.NONE);
+        this.level.getEntitiesOfClass(this.getType(), this.createAABB(), this::shouldExplode).forEach(entity -> {
+            this.level.explode(entity, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.shouldAddParticle(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
             entity.discard();
         });
     }
 
+    @Override
     protected AABB createAABB() {
         var shape = this.level.getBlockState(this.blockPos).getShape(this.level, this.blockPos);
         shape = shape.move(this.blockPos.getX(), this.blockPos.getY(), this.blockPos.getZ());

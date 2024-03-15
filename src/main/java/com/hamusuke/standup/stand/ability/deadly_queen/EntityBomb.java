@@ -1,13 +1,8 @@
 package com.hamusuke.standup.stand.ability.deadly_queen;
 
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.ExplosionDamageCalculator;
-import net.minecraft.world.level.Level.ExplosionInteraction;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 public class EntityBomb extends Bomb {
@@ -36,64 +31,48 @@ public class EntityBomb extends Bomb {
     }
 
     @Override
-    public void tick() {
-        if (this.explodeWhen == When.PUSH_SWITCH) {
-            return;
-        }
-
-        var touching = this.level.getEntitiesOfClass(Entity.class, this.createAABB(), entity -> entity != this.target);
-        if (this.whatExplodes == What.TOUCHING_ENTITY) {
-            touching.removeIf(entity -> entity == this.stand || entity == this.stand.getOwner());
-        }
-        if (!touching.isEmpty()) {
-            this.explode();
-        }
-    }
-
-    @Override
     protected void explodeSelf() {
-        this.level.explode(this.target, this.target.getX(), this.target.getY(), this.target.getZ(), 3.0F, ExplosionInteraction.NONE);
+        this.level.explode(this.target, this.getSource(), this.createDamageCalculator(), this.target.getX(), this.target.getY(), this.target.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.shouldAddParticle(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
         this.target.discard();
     }
 
     @Override
     protected void explodeTouchingEntity() {
-        this.level.getEntitiesOfClass(Entity.class, this.createAABB(), entity -> entity != this.target && entity != this.stand && entity != this.stand.getOwner()).forEach(entity -> {
-            this.level.explode(entity, this.level.damageSources().explosion(entity, this.stand), new EntityExplosionDamageCalculator(), entity.position(), 3.0F, false, ExplosionInteraction.NONE);
+        this.level.getEntitiesOfClass(Entity.class, this.createAABB(), this::shouldExplode).forEach(entity -> {
+            this.level.explode(entity, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.shouldAddParticle(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
             entity.discard();
         });
     }
 
+    @Override
     protected AABB createAABB() {
         return this.target.getBoundingBox();
     }
 
-    public Entity getTarget() {
-        return this.target;
+    @Override
+    protected boolean shouldExplode(Entity entity) {
+        return switch (this.whatExplodes) {
+            case SELF -> super.shouldExplode(entity);
+            case TOUCHING_ENTITY -> entity != this.target && super.shouldExplode(entity);
+        };
     }
 
-    protected class EntityExplosionDamageCalculator extends ExplosionDamageCalculator {
-        @Override
-        public boolean shouldBlockExplode(Explosion p_46094_, BlockGetter p_46095_, BlockPos p_46096_, BlockState p_46097_, float p_46098_) {
-            return false;
-        }
+    @Override
+    protected float getRadius() {
+        return 3.0F;
+    }
 
-        @Override
-        public boolean shouldDamageEntity(Explosion p_312772_, Entity p_311132_) {
-            return !this.shouldExclude(p_311132_) && super.shouldDamageEntity(p_312772_, p_311132_);
-        }
+    @Override
+    protected DamageSource getSource() {
+        return this.level.damageSources().explosion(this.target, this.stand.getOwner());
+    }
 
-        @Override
-        public float getEntityDamageAmount(Explosion p_310428_, Entity p_310135_) {
-            return this.shouldExclude(p_310135_) ? 0.0F : super.getEntityDamageAmount(p_310428_, p_310135_);
-        }
+    @Override
+    protected boolean fire() {
+        return true;
+    }
 
-        public boolean shouldExclude(Entity entity) {
-            if (entity == EntityBomb.this.stand.getOwner()) {
-                return true;
-            }
-
-            return EntityBomb.this.whatExplodes == What.TOUCHING_ENTITY && entity == EntityBomb.this.target;
-        }
+    public Entity getTarget() {
+        return this.target;
     }
 }
