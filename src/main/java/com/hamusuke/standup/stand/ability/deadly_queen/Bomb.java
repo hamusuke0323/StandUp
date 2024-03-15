@@ -1,12 +1,12 @@
 package com.hamusuke.standup.stand.ability.deadly_queen;
 
+import com.hamusuke.standup.registry.RegisteredSoundEvents;
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
@@ -89,7 +89,7 @@ public abstract class Bomb {
     }
 
     protected SoundEvent getExplosionSound() {
-        return SoundEvents.GENERIC_EXPLODE;
+        return RegisteredSoundEvents.BOOM.get();
     }
 
     protected ExplosionDamageCalculator createDamageCalculator() {

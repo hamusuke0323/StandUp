@@ -5,5 +5,22 @@
       "standup:punch2",
       "standup:punch3"
     ]
+  },
+  "stand.deadly_queen.boom": {
+    "sounds": [
+      "standup:stand/deadly_queen/boom1",
+      "standup:stand/deadly_queen/boom2",
+      "standup:stand/deadly_queen/boom3"
+    ]
+  },
+  "stand.deadly_queen.appear": {
+    "sounds": [
+      "standup:stand/deadly_queen/boom3"
+    ]
+  },
+  "stand.deadly_queen.click": {
+    "sounds": [
+      "standup:stand/deadly_queen/click"
+    ]
   }
 }

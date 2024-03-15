@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 @Mod(StandUp.MOD_ID)
 public class StandUp {
     public static final String MOD_ID = "standup";
-    public static final ResourceLocation STAND_CARD_REGISTRY_KEY = new ResourceLocation(MOD_ID, "stand_ability");
+    public static final ResourceLocation STAND_CARD_REGISTRY_KEY = new ResourceLocation(MOD_ID, "stand_card");
     private static final Set<Consumer<IEventBus>> REGISTRIES = Sets.newHashSet(
             RegisteredCreativeModeTabs.CREATIVE_MODE_TABS::register,
             RegisteredEntities.ENTITY_TYPES::register,

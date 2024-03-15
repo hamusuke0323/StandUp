@@ -7,12 +7,12 @@ import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.c2s.*;
 import com.hamusuke.standup.stand.stands.Stand;
+import com.hamusuke.standup.world.item.StandCardItem;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.PlayerSkin.Model;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory;
@@ -87,10 +87,11 @@ public class StandUpClient {
     public void onTick(final ClientTickEvent event) {
         if (event.phase == Phase.END) {
             while (STAND_UP_DOWN.consumeClick()) {
-                if (PlayerInvoker.invoker(mc.player).isStandAlive()) {
+                var invoker = PlayerInvoker.invoker(mc.player);
+                if (invoker.isStandAlive()) {
                     NetworkManager.sendToServer(new StandDownReq());
                 } else {
-                    NetworkManager.sendToServer(new StandUpReq(mc.player.getSkin().model() == Model.SLIM));
+                    NetworkManager.sendToServer(new StandUpReq(StandCardItem.getStandCardFrom(invoker.getStandCard()).isSlim(mc.player)));
                 }
             }
 
