@@ -15,6 +15,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.Nullable;
 
+import static com.hamusuke.standup.registry.RegisteredSoundEvents.APPEAR;
+
 public class DeadlyQueen extends Stand {
     @Nullable
     protected Bomb bomb;
@@ -84,5 +86,12 @@ public class DeadlyQueen extends Stand {
 
     public void releaseBomb() {
         this.bomb = null;
+    }
+
+    @Override
+    protected void onStandUp() {
+        super.onStandUp();
+
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), APPEAR.get(), this.getSoundSource(), 1.0F, 1.0F);
     }
 }

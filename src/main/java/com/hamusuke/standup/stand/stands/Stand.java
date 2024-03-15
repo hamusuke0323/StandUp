@@ -22,6 +22,7 @@ import net.minecraft.network.protocol.game.ClientboundSetCameraPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -404,11 +405,6 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     }
 
     @Override
-    public boolean isSilent() {
-        return true;
-    }
-
-    @Override
     public boolean onGround() {
         return false;
     }
@@ -571,17 +567,27 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     public void onAddedToWorld() {
         super.onAddedToWorld();
 
-        if (!this.level().isClientSide && this.getOwner() instanceof PlayerInvoker invoker) {
-            invoker.standUp(this);
+        if (!this.level().isClientSide) {
+            this.onStandUp();
         }
+    }
+
+    protected void onStandUp() {
+        PlayerInvoker.invoker(this.getOwner()).standUp(this);
     }
 
     @Override
     public void onRemovedFromWorld() {
         super.onRemovedFromWorld();
 
-        if (!this.level().isClientSide && this.getOwner() instanceof ServerPlayer serverPlayer) {
-            serverPlayer.connection.send(new ClientboundSetCameraPacket(this.getOwner()));
+        if (!this.level().isClientSide) {
+            this.onStandDown();
+        }
+    }
+
+    protected void onStandDown() {
+        if (this.getOwner() instanceof ServerPlayer player) {
+            player.connection.send(new ClientboundSetCameraPacket(this.getOwner()));
         }
 
         this.stopHoldingOwner();
@@ -613,6 +619,11 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     @Override
     public boolean isPickable() {
         return false;
+    }
+
+    @Override
+    public SoundSource getSoundSource() {
+        return SoundSource.PLAYERS;
     }
 
     @Override
