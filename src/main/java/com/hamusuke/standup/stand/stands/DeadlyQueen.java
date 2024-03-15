@@ -60,12 +60,12 @@ public class DeadlyQueen extends Stand {
 
     @Override
     public void onInteractAtBlock(BlockHitResult result) {
-        if (this.bomb instanceof BlockBomb blockBomb && blockBomb.getBlockPos() == result.getBlockPos()) {
+        if (this.bomb instanceof BlockBomb blockBomb && blockBomb.getBlockPos().equals(result.getBlockPos())) {
             this.releaseBomb();
             return;
         }
 
-        this.bomb = BlockBomb.touchTouching(this, result.getBlockPos());
+        this.bomb = BlockBomb.touchSelf(this, result.getBlockPos());
     }
 
     @Override

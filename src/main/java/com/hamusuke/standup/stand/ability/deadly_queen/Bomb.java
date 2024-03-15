@@ -1,6 +1,7 @@
 package com.hamusuke.standup.stand.ability.deadly_queen;
 
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -8,9 +9,11 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level.ExplosionInteraction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 public abstract class Bomb {
@@ -66,7 +69,7 @@ public abstract class Bomb {
     }
 
     protected float getRadius() {
-        return 1.0F;
+        return 2.0F;
     }
 
     protected boolean fire() {
@@ -74,11 +77,7 @@ public abstract class Bomb {
     }
 
     protected ExplosionInteraction getInteraction() {
-        return ExplosionInteraction.NONE;
-    }
-
-    protected boolean shouldAddParticle() {
-        return true;
+        return ExplosionInteraction.TNT;
     }
 
     protected ParticleOptions getSmallExplosionParticle() {
@@ -124,6 +123,11 @@ public abstract class Bomb {
 
         public BombDamageCalculator(Bomb bomb) {
             this.bomb = bomb;
+        }
+
+        @Override
+        public boolean shouldBlockExplode(Explosion p_46094_, BlockGetter p_46095_, BlockPos p_46096_, BlockState p_46097_, float p_46098_) {
+            return false;
         }
 
         @Override

@@ -34,7 +34,7 @@ public class FollowStandOwnerGoal extends Goal {
     @Override
     public boolean canUse() {
         var standOwner = this.stand.getOwner();
-        if (standOwner == null || standOwner.isSpectator() || this.unableToMove() || (this.stand.isAggressive() && !this.stand.isTooFarAway())) {
+        if (standOwner.isSpectator() || this.unableToMove() || this.stand.isAggressive() && !this.stand.isTooFarAway()) {
             return false;
         } else if (!standOwner.walkAnimation.isMoving() && this.stand.distanceToSqr(standOwner) < (double) (this.startDistance * this.startDistance)) {
             return false;

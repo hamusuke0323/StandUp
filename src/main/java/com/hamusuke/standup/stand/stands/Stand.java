@@ -578,10 +578,6 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     public boolean canAttack(LivingEntity p_21171_) {
-        if (this.getOwner() == null) {
-            return false;
-        }
-
         if (p_21171_ instanceof Player player && !this.getOwner().canHarmPlayer(player)) {
             return false;
         }
