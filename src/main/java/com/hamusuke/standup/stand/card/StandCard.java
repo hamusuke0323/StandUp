@@ -1,4 +1,4 @@
-package com.hamusuke.standup.stand.ability;
+package com.hamusuke.standup.stand.card;
 
 import com.hamusuke.standup.StandUp;
 import com.hamusuke.standup.stand.stands.Stand;

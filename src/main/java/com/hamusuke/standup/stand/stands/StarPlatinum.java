@@ -1,9 +1,9 @@
 package com.hamusuke.standup.stand.stands;
 
-import com.hamusuke.standup.stand.ability.StandCard;
 import com.hamusuke.standup.stand.ai.goal.StandRushAttackGoal;
 import com.hamusuke.standup.stand.ai.goal.target.StandMultipleAttackableTargetsGoal;
 import com.hamusuke.standup.stand.ai.goal.target.StandOwnerHurtTargetGoal;
+import com.hamusuke.standup.stand.card.StandCard;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;

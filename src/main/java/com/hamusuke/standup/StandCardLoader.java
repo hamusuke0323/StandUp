@@ -1,6 +1,6 @@
 package com.hamusuke.standup;
 
-import com.hamusuke.standup.stand.ability.StandCard;
+import com.hamusuke.standup.stand.card.StandCard;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

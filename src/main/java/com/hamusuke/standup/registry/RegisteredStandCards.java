@@ -1,6 +1,6 @@
 package com.hamusuke.standup.registry;
 
-import com.hamusuke.standup.stand.ability.StandCard;
+import com.hamusuke.standup.stand.card.StandCard;
 import net.minecraftforge.registries.DeferredRegister;
 
 import static com.hamusuke.standup.StandUp.MOD_ID;

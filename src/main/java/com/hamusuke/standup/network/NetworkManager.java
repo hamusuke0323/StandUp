@@ -34,6 +34,7 @@ public final class NetworkManager {
         MAIN.messageBuilder(SyncStandPosRotReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(SyncStandPosRotReq::new).consumerNetworkThread(SyncStandPosRotReq::handle).add();
         MAIN.messageBuilder(StandOperationModeToggleReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(buf -> new StandOperationModeToggleReq()).consumerNetworkThread(StandOperationModeToggleReq::handle).add();
         MAIN.messageBuilder(StandUpReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(StandUpReq::new).consumerNetworkThread(StandUpReq::handle).add();
+        MAIN.messageBuilder(UseStandAbilityReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(UseStandAbilityReq::new).consumerNetworkThread(UseStandAbilityReq::handle).add();
     }
 
     private static void registerS2CPackets() {

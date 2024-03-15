@@ -1,12 +1,12 @@
-package com.hamusuke.standup.stand.ability.advanced;
+package com.hamusuke.standup.stand.card.advanced;
 
-import com.hamusuke.standup.stand.ability.StandCard;
-import com.hamusuke.standup.stand.stands.KillerQueen;
+import com.hamusuke.standup.stand.card.StandCard;
+import com.hamusuke.standup.stand.stands.DeadlyQueen;
 import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-public class KillerQueenCard extends StandCard {
+public class DeadlyQueenCard extends StandCard {
     @Override
     public String getId() {
         return "killer_queen";
@@ -14,6 +14,6 @@ public class KillerQueenCard extends StandCard {
 
     @Override
     public Stand createStand(Level level, Player owner, boolean slim) {
-        return new KillerQueen(level, owner, slim, this);
+        return new DeadlyQueen(level, owner, slim, this);
     }
 }

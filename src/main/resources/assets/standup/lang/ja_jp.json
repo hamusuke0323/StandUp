@@ -9,6 +9,7 @@
   "standup.config.setStandCardMsg": "スタンドカードをセットしたときのメッセージを表示する",
   "standup.config.title": "Stand Up 設定",
   "standup.key.category": "Stand Up",
+  "standup.key.stand.ability": "スタンド能力を使う",
   "standup.key.stand.holdorrelease": "スタンド使いをつかむ/はなす",
   "standup.key.stand.toggle": "スタンド操作モードを切り替える",
   "standup.key.stand.updown": "スタンドを出す/引っ込める",

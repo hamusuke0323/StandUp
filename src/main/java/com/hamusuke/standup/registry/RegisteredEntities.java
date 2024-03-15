@@ -1,6 +1,6 @@
 package com.hamusuke.standup.registry;
 
-import com.hamusuke.standup.stand.ability.StandCard;
+import com.hamusuke.standup.stand.card.StandCard;
 import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;

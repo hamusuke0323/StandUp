@@ -13,5 +13,6 @@
   "item.standup.stand_card": "Stand Card",
   "standup.key.stand.updown": "Stand Up/Down",
   "standup.key.stand.holdorrelease": "Hold/Release Stand Owner",
-  "standup.key.stand.toggle": "Toggle Stand Operation Mode"
+  "standup.key.stand.toggle": "Toggle Stand Operation Mode",
+  "standup.key.stand.ability": "Use Stand Ability"
 }

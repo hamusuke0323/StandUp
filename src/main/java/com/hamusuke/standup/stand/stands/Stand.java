@@ -8,10 +8,10 @@ import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.s2c.HoldOrReleaseStandOwnerNotify;
 import com.hamusuke.standup.network.packet.s2c.StandOperationModeToggleNotify;
 import com.hamusuke.standup.stand.MultipleTarget;
-import com.hamusuke.standup.stand.ability.StandCard;
 import com.hamusuke.standup.stand.ai.goal.AutoDoorGoal;
 import com.hamusuke.standup.stand.ai.goal.AutoFenceGateGoal;
 import com.hamusuke.standup.stand.ai.goal.FollowStandOwnerGoal;
+import com.hamusuke.standup.stand.card.StandCard;
 import com.hamusuke.standup.util.MthH;
 import net.minecraft.Util;
 import net.minecraft.client.player.LocalPlayer;
@@ -27,6 +27,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -44,8 +45,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.*;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -171,8 +171,18 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     }
 
     @Override
+    public boolean isAlive() {
+        return this.getOwner().level().dimension() == this.level().dimension() && super.isAlive();
+    }
+
+    @Override
+    public ItemStack getPickedResult(HitResult target) {
+        return null;
+    }
+
+    @Override
     public void tick() {
-        if (!this.getOwner().isAlive() || this.getOwner().isSpectator()) {
+        if (!this.isAlive() || !this.getOwner().isAlive() || this.getOwner().isSpectator()) {
             this.remove(RemovalReason.DISCARDED);
         }
 
@@ -358,12 +368,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     public boolean isInvulnerableTo(DamageSource p_20122_) {
-        return true;
-    }
-
-    @Override
-    public boolean hurt(DamageSource p_21016_, float p_21017_) {
-        return false;
+        return !p_20122_.is(DamageTypes.GENERIC_KILL);
     }
 
     public boolean isFollowingOwner() {
@@ -616,6 +621,39 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
         p_19980_.openMenu(this);
         return InteractionResult.sidedSuccess(this.level().isClientSide);
+    }
+
+    public void onInteractAtBlock(BlockHitResult result, boolean checkReach) {
+        if (this.level().isClientSide) {
+            return;
+        }
+
+        if (!checkReach) {
+            this.onInteractAtBlock(result);
+        } else if (this.getOwner().canReach(result.getBlockPos(), 0.0D)) {
+            this.onInteractAtBlock(result);
+        }
+    }
+
+    public void onInteractAtBlock(BlockHitResult result) {
+    }
+
+    public void onInteractAt(EntityHitResult result, boolean checkReach) {
+        if (this.level().isClientSide) {
+            return;
+        }
+
+        if (!checkReach) {
+            this.onInteractAt(result);
+        } else if (this.getOwner().canReach(result.getLocation(), 0.0D)) {
+            this.onInteractAt(result);
+        }
+    }
+
+    public void onInteractAt(EntityHitResult result) {
+    }
+
+    public void onInteractAtAir() {
     }
 
     @Nullable

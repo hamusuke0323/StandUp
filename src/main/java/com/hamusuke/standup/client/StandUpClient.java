@@ -5,10 +5,7 @@ import com.hamusuke.standup.client.gui.screen.ConfigScreen;
 import com.hamusuke.standup.client.renderer.entity.StandRenderer;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
-import com.hamusuke.standup.network.packet.c2s.HoldOrReleaseOwnerReq;
-import com.hamusuke.standup.network.packet.c2s.StandDownReq;
-import com.hamusuke.standup.network.packet.c2s.StandOperationModeToggleReq;
-import com.hamusuke.standup.network.packet.c2s.StandUpReq;
+import com.hamusuke.standup.network.packet.c2s.*;
 import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
@@ -42,9 +39,10 @@ import static com.hamusuke.standup.registry.RegisteredMenus.CARD_MENU;
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class StandUpClient {
     private static final Minecraft mc = Minecraft.getInstance();
-    public static final KeyMapping STAND_UP_DOWN = new KeyMapping(MOD_ID + ".key.stand.updown", GLFW.GLFW_KEY_Z, MOD_ID + ".key.category");
-    public static final KeyMapping HOLD_OR_RELEASE_OWNER = new KeyMapping(MOD_ID + ".key.stand.holdorrelease", GLFW.GLFW_KEY_C, MOD_ID + ".key.category");
-    public static final KeyMapping TOGGLE_STAND_OPERATION_MODE = new KeyMapping(MOD_ID + ".key.stand.toggle", GLFW.GLFW_KEY_X, MOD_ID + ".key.category");
+    private static final KeyMapping STAND_UP_DOWN = new KeyMapping(MOD_ID + ".key.stand.updown", GLFW.GLFW_KEY_Z, MOD_ID + ".key.category");
+    private static final KeyMapping HOLD_OR_RELEASE_OWNER = new KeyMapping(MOD_ID + ".key.stand.holdorrelease", GLFW.GLFW_KEY_C, MOD_ID + ".key.category");
+    private static final KeyMapping TOGGLE_STAND_OPERATION_MODE = new KeyMapping(MOD_ID + ".key.stand.toggle", GLFW.GLFW_KEY_X, MOD_ID + ".key.category");
+    private static final KeyMapping USE_STAND_ABILITY = new KeyMapping(MOD_ID + ".key.stand.ability", GLFW.GLFW_KEY_V, MOD_ID + ".key.category");
     private static StandUpClient INSTANCE;
 
     private StandUpClient() {
@@ -67,24 +65,11 @@ public class StandUpClient {
     }
 
     @SubscribeEvent
-    public void onTick(final ClientTickEvent event) {
-        if (event.phase == Phase.END) {
-            while (STAND_UP_DOWN.consumeClick()) {
-                if (PlayerInvoker.invoker(mc.player).isStandAlive()) {
-                    NetworkManager.sendToServer(new StandDownReq());
-                } else {
-                    NetworkManager.sendToServer(new StandUpReq(mc.player.getSkin().model() == Model.SLIM));
-                }
-            }
-
-            while (HOLD_OR_RELEASE_OWNER.consumeClick()) {
-                NetworkManager.sendToServer(new HoldOrReleaseOwnerReq());
-            }
-
-            while (TOGGLE_STAND_OPERATION_MODE.consumeClick()) {
-                NetworkManager.sendToServer(new StandOperationModeToggleReq());
-            }
-        }
+    static void onRegisterKey(final RegisterKeyMappingsEvent event) {
+        event.register(STAND_UP_DOWN);
+        event.register(HOLD_OR_RELEASE_OWNER);
+        event.register(TOGGLE_STAND_OPERATION_MODE);
+        event.register(USE_STAND_ABILITY);
     }
 
     @SubscribeEvent
@@ -99,10 +84,28 @@ public class StandUpClient {
     }
 
     @SubscribeEvent
-    static void onRegisterKey(final RegisterKeyMappingsEvent event) {
-        event.register(STAND_UP_DOWN);
-        event.register(HOLD_OR_RELEASE_OWNER);
-        event.register(TOGGLE_STAND_OPERATION_MODE);
+    public void onTick(final ClientTickEvent event) {
+        if (event.phase == Phase.END) {
+            while (STAND_UP_DOWN.consumeClick()) {
+                if (PlayerInvoker.invoker(mc.player).isStandAlive()) {
+                    NetworkManager.sendToServer(new StandDownReq());
+                } else {
+                    NetworkManager.sendToServer(new StandUpReq(mc.player.getSkin().model() == Model.SLIM));
+                }
+            }
+
+            while (HOLD_OR_RELEASE_OWNER.consumeClick() && PlayerInvoker.invoker(mc.player).isStandAlive()) {
+                NetworkManager.sendToServer(new HoldOrReleaseOwnerReq());
+            }
+
+            while (TOGGLE_STAND_OPERATION_MODE.consumeClick() && PlayerInvoker.invoker(mc.player).isStandAlive()) {
+                NetworkManager.sendToServer(new StandOperationModeToggleReq());
+            }
+
+            while (USE_STAND_ABILITY.consumeClick() && PlayerInvoker.invoker(mc.player).isControllingStand()) {
+                NetworkManager.sendToServer(new UseStandAbilityReq(mc.hitResult));
+            }
+        }
     }
 
     @SubscribeEvent

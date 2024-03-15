@@ -6,7 +6,7 @@ import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.s2c.StandCardSetNotify;
 import com.hamusuke.standup.registry.*;
-import com.hamusuke.standup.stand.ability.StandCard;
+import com.hamusuke.standup.stand.card.StandCard;
 import com.hamusuke.standup.stand.stands.Stand;
 import com.hamusuke.standup.stand.stands.Stand.StandOperationMode;
 import net.minecraft.resources.ResourceLocation;
@@ -17,6 +17,7 @@ import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -115,6 +116,13 @@ public class StandUp {
     public void onPlayerLoggedIn(final PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
             NetworkManager.sendToClient(new StandCardSetNotify(serverPlayer.getId(), ((PlayerInvoker) serverPlayer).getStandCard(), false), serverPlayer);
+        }
+    }
+
+    @SubscribeEvent
+    public void onChangedDim(final PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof PlayerInvoker invoker) {
+            invoker.standDown();
         }
     }
 }

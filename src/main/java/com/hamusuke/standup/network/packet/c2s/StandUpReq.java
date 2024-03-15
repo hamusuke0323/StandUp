@@ -30,7 +30,7 @@ public record StandUpReq(boolean slim) implements Packet {
             }
 
             sender.serverLevel().getAllEntities().forEach(entity -> {
-                if (entity instanceof Stand stand && (stand.getOwner() == null || stand.getOwner() == sender)) {
+                if (entity instanceof Stand stand && stand.getOwner() == sender) {
                     stand.remove(RemovalReason.DISCARDED);
                 }
             });

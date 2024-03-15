@@ -1,6 +1,6 @@
 package com.hamusuke.standup.world.item;
 
-import com.hamusuke.standup.stand.ability.StandCard;
+import com.hamusuke.standup.stand.card.StandCard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
