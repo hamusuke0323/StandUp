@@ -6,7 +6,6 @@ import com.hamusuke.standup.stand.stands.Stand;
 import com.hamusuke.standup.util.MthH;
 import com.hamusuke.standup.world.item.StandCardItem;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 
 public record StandUpReq(boolean slim) implements Packet {
@@ -31,7 +30,7 @@ public record StandUpReq(boolean slim) implements Packet {
 
             sender.serverLevel().getAllEntities().forEach(entity -> {
                 if (entity instanceof Stand stand && stand.getOwner() == sender) {
-                    stand.remove(RemovalReason.DISCARDED);
+                    stand.discard();
                 }
             });
 

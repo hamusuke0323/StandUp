@@ -19,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.network.protocol.game.ClientboundSetCameraPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -64,19 +63,19 @@ import static com.hamusuke.standup.registry.RegisteredSoundEvents.PUNCH;
 
 public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget, OwnableEntity, IEntityAdditionalSpawnData {
     protected final Player owner;
-    protected final ResourceLocation standCardId;
+    protected final StandCard standCard;
     protected StandOperationMode mode = StandOperationMode.AI;
     protected final Set<LivingEntity> targets = Sets.newHashSet();
     protected boolean holdingOwner;
 
-    public Stand(Level level, Player owner, boolean slim, StandCard standCardId) {
-        this(slim ? SLIM_STAND_TYPE.get() : STAND_TYPE.get(), level, owner, standCardId);
+    public Stand(Level level, Player owner, boolean slim, StandCard standCard) {
+        this(slim ? SLIM_STAND_TYPE.get() : STAND_TYPE.get(), level, owner, standCard);
     }
 
-    public Stand(EntityType<? extends Stand> type, Level p_21369_, Player owner, StandCard standCardId) {
+    public Stand(EntityType<? extends Stand> type, Level p_21369_, Player owner, StandCard standCard) {
         super(type, p_21369_);
         this.owner = owner;
-        this.standCardId = standCardId.getCardId();
+        this.standCard = standCard;
         this.moveControl = new FlyingMoveControl(this, 0, true) {
             @Override
             public void tick() {
@@ -142,6 +141,18 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     }
 
     @Override
+    public boolean removeWhenFarAway(double p_21542_) {
+        return false;
+    }
+
+    @Override
+    public void checkDespawn() {
+        if (!this.getOwner().isAlive() || this.getOwner().level().dimension() != this.level().dimension()) {
+            this.discard();
+        }
+    }
+
+    @Override
     public boolean equals(Object p_20245_) {
         if (p_20245_ instanceof Stand stand && stand.getOwner() == this.getOwner()) {
             return true;
@@ -183,7 +194,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     @Override
     public void tick() {
         if (!this.isAlive() || !this.getOwner().isAlive() || this.getOwner().isSpectator()) {
-            this.remove(RemovalReason.DISCARDED);
+            this.discard();
         }
 
         this.noPhysics = true;
@@ -652,6 +663,10 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     public void onInteractAtAir() {
     }
 
+    public StandCard getStandCard() {
+        return this.standCard;
+    }
+
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
@@ -661,7 +676,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     @Override
     public void writeSpawnData(FriendlyByteBuf friendlyByteBuf) {
         friendlyByteBuf.writeUUID(this.getOwnerUUID());
-        friendlyByteBuf.writeResourceLocation(this.standCardId);
+        friendlyByteBuf.writeResourceLocation(this.standCard.getCardId());
     }
 
     @Override

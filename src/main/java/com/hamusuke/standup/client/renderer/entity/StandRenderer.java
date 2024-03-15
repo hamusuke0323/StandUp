@@ -166,6 +166,11 @@ public class StandRenderer extends HumanoidMobRenderer<Stand, StandModel> {
 
     @Override
     public ResourceLocation getTextureLocation(Stand stand) {
+        var texture = stand.getStandCard().getStandTexture();
+        if (texture != null) {
+            return texture;
+        }
+
         if (stand.getOwner() instanceof AbstractClientPlayer player) {
             return player.getSkin().texture();
         }

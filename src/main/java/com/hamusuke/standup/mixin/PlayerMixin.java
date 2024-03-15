@@ -45,7 +45,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
     @Override
     public void standUp(@NotNull Stand stand) {
         if (this.stand != null) {
-            this.stand.remove(RemovalReason.KILLED);
+            this.stand.discard();
         }
 
         this.stand = stand;
@@ -57,7 +57,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
     @Override
     public void standDown() {
         if (this.isStandAlive()) {
-            this.stand.remove(RemovalReason.KILLED);
+            this.stand.discard();
         }
 
         var owner = this.stand.getOwner();
