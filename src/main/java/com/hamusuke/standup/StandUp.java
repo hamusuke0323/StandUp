@@ -19,6 +19,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
@@ -159,6 +160,18 @@ public class StandUp {
                     e.setTarget(player.getUUID());
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onToss(final ItemTossEvent event) {
+        var player = event.getPlayer();
+        if (player.level().isClientSide) {
+            return;
+        }
+
+        if (player instanceof PlayerInvoker invoker && invoker.isControllingStand()) {
+            event.getEntity().setPos(invoker.getStand().getX(), invoker.getStand().getEyeY() - 0.30000001192092896D, invoker.getStand().getZ());
         }
     }
 }

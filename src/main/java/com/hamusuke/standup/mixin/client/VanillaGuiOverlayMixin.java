@@ -2,12 +2,15 @@ package com.hamusuke.standup.mixin.client;
 
 import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+@OnlyIn(Dist.CLIENT)
 @Mixin(VanillaGuiOverlay.class)
 public abstract class VanillaGuiOverlayMixin {
     @Redirect(method = {"lambda$static$8", "lambda$static$9", "lambda$static$10", "lambda$static$11"}, at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/gui/overlay/ForgeGui;shouldDrawSurvivalElements()Z"))
