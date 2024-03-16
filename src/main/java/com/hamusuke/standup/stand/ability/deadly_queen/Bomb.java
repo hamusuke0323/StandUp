@@ -5,6 +5,7 @@ import com.hamusuke.standup.stand.stands.DeadlyQueen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -16,7 +17,13 @@ import net.minecraft.world.level.Level.ExplosionInteraction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
+import static com.hamusuke.standup.StandUp.MOD_ID;
+
 public abstract class Bomb {
+    private static final Component PUSH_SWITCH_DESC = Component.translatable(MOD_ID + ".when.switch");
+    private static final Component TOUCH_DESC = Component.translatable(MOD_ID + ".when.touch");
+    private static final Component SELF_DESC = Component.translatable(MOD_ID + ".what.self");
+    private static final Component TOUCHING_DESC = Component.translatable(MOD_ID + ".what.touching");
     protected final DeadlyQueen stand;
     protected final ServerLevel level;
     protected final When explodeWhen;
@@ -109,13 +116,25 @@ public abstract class Bomb {
     }
 
     public enum When {
-        PUSH_SWITCH,
-        TOUCH
+        PUSH_SWITCH(PUSH_SWITCH_DESC),
+        TOUCH(TOUCH_DESC);
+
+        public final Component desc;
+
+        When(Component desc) {
+            this.desc = desc;
+        }
     }
 
     public enum What {
-        SELF,
-        TOUCHING_ENTITY
+        SELF(SELF_DESC),
+        TOUCHING_ENTITY(TOUCHING_DESC);
+
+        public final Component desc;
+
+        What(Component desc) {
+            this.desc = desc;
+        }
     }
 
     protected static class BombDamageCalculator extends ExplosionDamageCalculator {

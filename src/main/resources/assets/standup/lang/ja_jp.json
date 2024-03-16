@@ -2,7 +2,7 @@
   "entity.standup.slim_stand": "スタンド",
   "entity.standup.stand": "スタンド",
   "item.standup.stand_card": "スタンドカード",
-  "standup.cards.killer_queen": "キラークイーン",
+  "standup.cards.deadly_queen": "キラークイーン",
   "standup.cards.star_platinum": "スタープラチナ",
   "standup.config.canOpenDoor": "スタンドがドアを開けられるか",
   "standup.config.canOpenGate": "スタンドがフェンスゲートを開けられるか",
@@ -13,6 +13,11 @@
   "standup.key.stand.holdorrelease": "スタンド使いをつかむ/はなす",
   "standup.key.stand.toggle": "スタンド操作モードを切り替える",
   "standup.key.stand.updown": "スタンドを出す/引っ込める",
+  "standup.screen.bomb": "新しい爆弾",
   "standup.system.again": "スタンド能力を引き出すにはスタンドを再度出してください。",
-  "standup.tab.title": "Stand Up"
+  "standup.tab.title": "Stand Up",
+  "standup.what.self": "爆弾が爆発する",
+  "standup.what.touching": "触れているエンティティが爆発する",
+  "standup.when.switch": "点火スイッチを押した時",
+  "standup.when.touch": "何かが触れた時"
 }

@@ -15,7 +15,7 @@ public class DeadlyQueenCard extends StandCard {
 
     @Override
     public String getId() {
-        return "killer_queen";
+        return "deadly_queen";
     }
 
     @Override
