@@ -4,6 +4,7 @@ import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.s2c.DeadlyQueenWantsToKnowNewBombInfoReq;
 import com.hamusuke.standup.stand.ability.deadly_queen.BlockBomb;
 import com.hamusuke.standup.stand.ability.deadly_queen.Bomb;
+import com.hamusuke.standup.stand.ability.deadly_queen.Bomb.When;
 import com.hamusuke.standup.stand.ability.deadly_queen.EntityBomb;
 import com.hamusuke.standup.stand.ai.goal.StandRushAttackGoal;
 import com.hamusuke.standup.stand.ai.goal.target.StandMultipleAttackableTargetsGoal;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.hamusuke.standup.StandUp.MOD_ID;
 import static com.hamusuke.standup.registry.RegisteredSoundEvents.APPEAR;
+import static com.hamusuke.standup.registry.RegisteredSoundEvents.CLICK;
 
 public class DeadlyQueen extends Stand {
     protected static final Component RELEASE_BOMB = Component.translatable(MOD_ID + ".stand.release.bomb");
@@ -90,6 +92,14 @@ public class DeadlyQueen extends Stand {
         }
 
         NetworkManager.sendToClient(new DeadlyQueenWantsToKnowNewBombInfoReq(result), (ServerPlayer) this.getOwner());
+    }
+
+    @Override
+    public void onInteractAtAir() {
+        if (this.bomb != null && this.bomb.getExplodeWhen() == When.PUSH_SWITCH) {
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), CLICK.get(), this.getSoundSource(), 1.0F, 1.0F);
+            this.bomb.ignite();
+        }
     }
 
     public void placeBomb(Bomb bomb) {

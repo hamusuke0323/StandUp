@@ -56,6 +56,14 @@ public abstract class Bomb {
         }
     }
 
+    public When getExplodeWhen() {
+        return this.explodeWhen;
+    }
+
+    public What getWhatExplodes() {
+        return this.whatExplodes;
+    }
+
     protected void explode() {
         this.exploded = true;
 

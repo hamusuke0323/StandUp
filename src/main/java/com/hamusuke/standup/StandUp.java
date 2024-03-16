@@ -24,6 +24,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
@@ -173,5 +174,13 @@ public class StandUp {
         if (player instanceof PlayerInvoker invoker && invoker.isControllingStand()) {
             event.getEntity().setPos(invoker.getStand().getX(), invoker.getStand().getEyeY() - 0.30000001192092896D, invoker.getStand().getZ());
         }
+    }
+
+    @SubscribeEvent
+    public void onClone(final Clone event) {
+        var cloned = PlayerInvoker.invoker(event.getEntity());
+        var origin = PlayerInvoker.invoker(event.getOriginal());
+
+        cloned.setStandCard(origin.getStandCard());
     }
 }
