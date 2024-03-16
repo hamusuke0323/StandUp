@@ -6,8 +6,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import net.minecraftforge.fml.DistExecutor;
 
-public record DeadlyQueenAskBombPosNotify() implements Packet {
-    public DeadlyQueenAskBombPosNotify(FriendlyByteBuf buf) {
+public record DeadlyQueenWantsToKnowNewBombInfoReq() implements Packet {
+    public DeadlyQueenWantsToKnowNewBombInfoReq(FriendlyByteBuf buf) {
         this();
     }
 
