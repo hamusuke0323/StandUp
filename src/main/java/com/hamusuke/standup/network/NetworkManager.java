@@ -28,6 +28,7 @@ public final class NetworkManager {
     }
 
     private static void registerC2SPackets() {
+        MAIN.messageBuilder(DeadlyQueenWantsToKnowNewBombInfoRsp.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(DeadlyQueenWantsToKnowNewBombInfoRsp::new).consumerNetworkThread(DeadlyQueenWantsToKnowNewBombInfoRsp::handle).add();
         MAIN.messageBuilder(HoldOrReleaseOwnerReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(buf -> new HoldOrReleaseOwnerReq()).consumerNetworkThread(HoldOrReleaseOwnerReq::handle).add();
         MAIN.messageBuilder(StandDownReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(buf -> new StandDownReq()).consumerNetworkThread(StandDownReq::handle).add();
         MAIN.messageBuilder(StandMovementInputReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(StandMovementInputReq::new).consumerNetworkThread(StandMovementInputReq::handle).add();
@@ -38,6 +39,7 @@ public final class NetworkManager {
     }
 
     private static void registerS2CPackets() {
+        MAIN.messageBuilder(DeadlyQueenWantsToKnowNewBombInfoReq.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(DeadlyQueenWantsToKnowNewBombInfoReq::new).consumerNetworkThread(DeadlyQueenWantsToKnowNewBombInfoReq::handle).add();
         MAIN.messageBuilder(HoldOrReleaseStandOwnerNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(HoldOrReleaseStandOwnerNotify::new).consumerNetworkThread(HoldOrReleaseStandOwnerNotify::handle).add();
         MAIN.messageBuilder(StandAppearNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandAppearNotify::new).consumerNetworkThread(StandAppearNotify::handle).add();
         MAIN.messageBuilder(StandCardSetNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandCardSetNotify::new).consumerNetworkThread(StandCardSetNotify::handle).add();

@@ -5,6 +5,7 @@ import com.hamusuke.standup.stand.stands.DeadlyQueen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -63,6 +64,12 @@ public abstract class Bomb {
             case SELF -> this.explodeSelf();
             case TOUCHING_ENTITY -> this.explodeTouchingEntity();
         }
+    }
+
+    public void toBuf(FriendlyByteBuf buf) {
+        buf.writeVarInt(this.stand.getId());
+        buf.writeEnum(this.explodeWhen);
+        buf.writeEnum(this.whatExplodes);
     }
 
     protected abstract void explodeSelf();

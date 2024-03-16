@@ -12,15 +12,13 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import org.jetbrains.annotations.Nullable;
 
-public final class UseStandAbilityReq implements Packet {
-    private final InteractionDataSerializer serializer;
-
+public record UseStandAbilityReq(InteractionDataSerializer serializer) implements Packet {
     public UseStandAbilityReq(@Nullable HitResult result) {
-        this.serializer = new InteractionDataSerializer(result);
+        this(new InteractionDataSerializer(result));
     }
 
     public UseStandAbilityReq(FriendlyByteBuf buf) {
-        this.serializer = new InteractionDataSerializer(buf);
+        this(new InteractionDataSerializer(buf));
     }
 
     @Override
