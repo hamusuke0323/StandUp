@@ -9,12 +9,18 @@ import com.hamusuke.standup.registry.*;
 import com.hamusuke.standup.stand.card.StandCard;
 import com.hamusuke.standup.stand.stands.Stand;
 import com.hamusuke.standup.stand.stands.Stand.StandOperationMode;
+import com.hamusuke.standup.world.item.StandCardItem;
+import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
@@ -29,6 +35,8 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegistryBuilder;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -123,6 +131,34 @@ public class StandUp {
     public void onChangedDim(final PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof PlayerInvoker invoker) {
             invoker.standDown();
+        }
+    }
+
+    @SubscribeEvent
+    public void onDeath(final LivingDeathEvent event) {
+        if (event.getEntity() instanceof EnderDragon dragon && dragon.getDragonFight() != null && !dragon.level().isClientSide) {
+            var card = StandCardItem.createForStandCard(Util.getRandomSafe(StandUp.getReg().get().getValues().stream().toList(), dragon.getRandom()).orElse(StandCard.EMPTY));
+            if (card.isEmpty() || !StandCardItem.hasStandCard(card)) {
+                return;
+            }
+
+            var players = List.copyOf(dragon.level().players());
+            Collections.shuffle(players);
+            if (players.isEmpty()) {
+                return;
+            }
+
+            var player = players.get(0);
+            if (player.getInventory().add(card)) {
+                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                player.containerMenu.broadcastChanges();
+            } else {
+                var e = player.drop(card, false);
+                if (e != null) {
+                    e.setNoPickUpDelay();
+                    e.setTarget(player.getUUID());
+                }
+            }
         }
     }
 }

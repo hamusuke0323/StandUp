@@ -28,7 +28,7 @@ public class StandCardItem extends Item {
 
     public static void setStandCard(ItemStack stack, StandCard standCard) {
         var key = standCard.getCardId();
-        if (key != null) {
+        if (key != null && !key.getPath().isBlank()) {
             stack.getOrCreateTag().putString("id", key.toString());
         }
     }
@@ -37,6 +37,10 @@ public class StandCardItem extends Item {
         var itemStack = new ItemStack(STAND_CARD.get());
         setStandCard(itemStack, standCard);
         return itemStack;
+    }
+
+    public static boolean hasStandCard(ItemStack stack) {
+        return getStandCardFrom(stack) != StandCard.EMPTY;
     }
 
     public static StandCard getStandCardFrom(ItemStack stack) {

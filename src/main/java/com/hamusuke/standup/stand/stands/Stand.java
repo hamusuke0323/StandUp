@@ -508,6 +508,14 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         return true;
     }
 
+    @Override
+    public void push(Entity p_21294_) {
+    }
+
+    @Override
+    public void push(double p_20286_, double p_20287_, double p_20288_) {
+    }
+
     public StandOperationMode getMode() {
         return this.mode;
     }
