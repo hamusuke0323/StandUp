@@ -13,26 +13,10 @@ import net.minecraft.world.phys.AABB;
 public class BlockBomb extends Bomb {
     protected final BlockPos blockPos;
 
-    protected BlockBomb(DeadlyQueen stand, When explodeWhen, What whatExplodes, BlockPos blockPos) {
+    public BlockBomb(DeadlyQueen stand, When explodeWhen, What whatExplodes, BlockPos blockPos) {
         super(stand, explodeWhen, whatExplodes);
 
         this.blockPos = blockPos;
-    }
-
-    public static BlockBomb pushSwitchSelf(DeadlyQueen source, BlockPos blockPos) {
-        return new BlockBomb(source, When.PUSH_SWITCH, What.SELF, blockPos);
-    }
-
-    public static BlockBomb pushSwitchTouching(DeadlyQueen source, BlockPos blockPos) {
-        return new BlockBomb(source, When.PUSH_SWITCH, What.TOUCHING_ENTITY, blockPos);
-    }
-
-    public static BlockBomb touchSelf(DeadlyQueen source, BlockPos blockPos) {
-        return new BlockBomb(source, When.TOUCH, What.SELF, blockPos);
-    }
-
-    public static BlockBomb touchTouching(DeadlyQueen source, BlockPos blockPos) {
-        return new BlockBomb(source, When.TOUCH, What.TOUCHING_ENTITY, blockPos);
     }
 
     @Override

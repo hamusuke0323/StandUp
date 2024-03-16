@@ -1,5 +1,7 @@
 package com.hamusuke.standup.stand.stands;
 
+import com.hamusuke.standup.network.NetworkManager;
+import com.hamusuke.standup.network.packet.s2c.DeadlyQueenWantsToKnowNewBombInfoReq;
 import com.hamusuke.standup.stand.ability.deadly_queen.BlockBomb;
 import com.hamusuke.standup.stand.ability.deadly_queen.Bomb;
 import com.hamusuke.standup.stand.ability.deadly_queen.EntityBomb;
@@ -7,6 +9,8 @@ import com.hamusuke.standup.stand.ai.goal.StandRushAttackGoal;
 import com.hamusuke.standup.stand.ai.goal.target.StandMultipleAttackableTargetsGoal;
 import com.hamusuke.standup.stand.ai.goal.target.StandOwnerHurtTargetGoal;
 import com.hamusuke.standup.stand.card.StandCard;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
@@ -15,9 +19,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.Nullable;
 
+import static com.hamusuke.standup.StandUp.MOD_ID;
 import static com.hamusuke.standup.registry.RegisteredSoundEvents.APPEAR;
 
 public class DeadlyQueen extends Stand {
+    protected static final Component RELEASE_BOMB = Component.translatable(MOD_ID + ".stand.release.bomb");
     @Nullable
     protected Bomb bomb;
 
@@ -64,16 +70,18 @@ public class DeadlyQueen extends Stand {
     public void onInteractAtBlock(BlockHitResult result) {
         if (this.bomb instanceof BlockBomb blockBomb && blockBomb.getBlockPos().equals(result.getBlockPos())) {
             this.releaseBomb();
+            ((ServerPlayer) this.getOwner()).sendSystemMessage(RELEASE_BOMB, true);
             return;
         }
 
-        this.bomb = BlockBomb.touchSelf(this, result.getBlockPos());
+        NetworkManager.sendToClient(new DeadlyQueenWantsToKnowNewBombInfoReq(result), (ServerPlayer) this.getOwner());
     }
 
     @Override
     public void onInteractAt(EntityHitResult result) {
         if (this.bomb instanceof EntityBomb entityBomb && entityBomb.getTarget() == result.getEntity()) {
             this.releaseBomb();
+            ((ServerPlayer) this.getOwner()).sendSystemMessage(RELEASE_BOMB, true);
             return;
         }
 
@@ -81,7 +89,11 @@ public class DeadlyQueen extends Stand {
             return;
         }
 
-        this.bomb = EntityBomb.touchTouching(this, result.getEntity());
+        NetworkManager.sendToClient(new DeadlyQueenWantsToKnowNewBombInfoReq(result), (ServerPlayer) this.getOwner());
+    }
+
+    public void placeBomb(Bomb bomb) {
+        this.bomb = bomb;
     }
 
     public void releaseBomb() {

@@ -14,6 +14,7 @@
   "standup.key.stand.toggle": "スタンド操作モードを切り替える",
   "standup.key.stand.updown": "スタンドを出す/引っ込める",
   "standup.screen.bomb": "新しい爆弾",
+  "standup.stand.release.bomb": "爆弾を解除した!",
   "standup.system.again": "スタンド能力を引き出すにはスタンドを再度出してください。",
   "standup.tab.title": "Stand Up",
   "standup.what.self": "爆弾が爆発する",

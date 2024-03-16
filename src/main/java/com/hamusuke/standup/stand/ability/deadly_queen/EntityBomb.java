@@ -8,26 +8,10 @@ import net.minecraft.world.phys.AABB;
 public class EntityBomb extends Bomb {
     protected final Entity target;
 
-    protected EntityBomb(DeadlyQueen stand, When explodeWhen, What whatExplodes, Entity target) {
+    public EntityBomb(DeadlyQueen stand, When explodeWhen, What whatExplodes, Entity target) {
         super(stand, explodeWhen, whatExplodes);
 
         this.target = target;
-    }
-
-    public static EntityBomb pushSwitchSelf(DeadlyQueen source, Entity target) {
-        return new EntityBomb(source, When.PUSH_SWITCH, What.SELF, target);
-    }
-
-    public static EntityBomb pushSwitchTouching(DeadlyQueen source, Entity target) {
-        return new EntityBomb(source, When.PUSH_SWITCH, What.TOUCHING_ENTITY, target);
-    }
-
-    public static EntityBomb touchSelf(DeadlyQueen source, Entity target) {
-        return new EntityBomb(source, When.TOUCH, What.SELF, target);
-    }
-
-    public static EntityBomb touchTouching(DeadlyQueen source, Entity target) {
-        return new EntityBomb(source, When.TOUCH, What.TOUCHING_ENTITY, target);
     }
 
     @Override
