@@ -14,12 +14,12 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import net.minecraftforge.fml.DistExecutor;
 
-public record DeadlyQueenWantsToKnowNewBombInfoReq(InteractionDataSerializer serializer) implements Packet {
-    public DeadlyQueenWantsToKnowNewBombInfoReq(HitResult result) {
+public record AskBombInfoReq(InteractionDataSerializer serializer) implements Packet {
+    public AskBombInfoReq(HitResult result) {
         this(new InteractionDataSerializer(result));
     }
 
-    public DeadlyQueenWantsToKnowNewBombInfoReq(FriendlyByteBuf buf) {
+    public AskBombInfoReq(FriendlyByteBuf buf) {
         this(new InteractionDataSerializer(buf));
     }
 

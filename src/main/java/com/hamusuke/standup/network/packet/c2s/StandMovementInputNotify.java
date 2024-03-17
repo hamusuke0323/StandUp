@@ -5,8 +5,8 @@ import com.hamusuke.standup.network.packet.Packet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 
-public record StandMovementInputReq(float xxa, float zza, boolean jumping, boolean shiftKeyDown) implements Packet {
-    public StandMovementInputReq(FriendlyByteBuf buf) {
+public record StandMovementInputNotify(float xxa, float zza, boolean jumping, boolean shiftKeyDown) implements Packet {
+    public StandMovementInputNotify(FriendlyByteBuf buf) {
         this(buf.readFloat(), buf.readFloat(), buf.readBoolean(), buf.readBoolean());
     }
 

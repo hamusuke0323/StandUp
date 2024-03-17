@@ -1,7 +1,7 @@
 package com.hamusuke.standup.stand.stands;
 
 import com.hamusuke.standup.network.NetworkManager;
-import com.hamusuke.standup.network.packet.s2c.DeadlyQueenWantsToKnowNewBombInfoReq;
+import com.hamusuke.standup.network.packet.s2c.AskBombInfoReq;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.BlockBomb;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.When;
@@ -89,7 +89,7 @@ public class DeadlyQueen extends Stand {
             return;
         }
 
-        NetworkManager.sendToClient(new DeadlyQueenWantsToKnowNewBombInfoReq(result), (ServerPlayer) this.getOwner());
+        NetworkManager.sendToClient(new AskBombInfoReq(result), (ServerPlayer) this.getOwner());
     }
 
     @Override
@@ -104,7 +104,7 @@ public class DeadlyQueen extends Stand {
             return;
         }
 
-        NetworkManager.sendToClient(new DeadlyQueenWantsToKnowNewBombInfoReq(result), (ServerPlayer) this.getOwner());
+        NetworkManager.sendToClient(new AskBombInfoReq(result), (ServerPlayer) this.getOwner());
     }
 
     @Override

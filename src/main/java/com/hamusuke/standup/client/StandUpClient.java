@@ -17,6 +17,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent.Clone;
 import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -111,7 +112,7 @@ public class StandUpClient {
             }
 
             while (TOGGLE_STAND_OPERATION_MODE.consumeClick() && PlayerInvoker.invoker(mc.player).isStandAlive()) {
-                NetworkManager.sendToServer(new StandOperationModeToggleReq());
+                NetworkManager.sendToServer(new StandOpModeToggleReq());
             }
 
             while (USE_STAND_ABILITY.consumeClick()) {
@@ -120,7 +121,7 @@ public class StandUpClient {
                     requestToStandUp();
                 }
 
-                NetworkManager.sendToServer(new UseStandAbilityReq(mc.hitResult));
+                NetworkManager.sendToServer(new UseStandAbilityNotify(mc.hitResult));
             }
         }
     }
@@ -130,5 +131,12 @@ public class StandUpClient {
         if (mc.screen == null && mc.options.getCameraType() == CameraType.FIRST_PERSON && event.getEntity() instanceof LocalPlayer localPlayer && localPlayer instanceof PlayerInvoker invoker && invoker.isControllingStand() && invoker.getStand().isHoldingOwner()) {
             event.setCanceled(true);
         }
+    }
+
+    @SubscribeEvent
+    public void onClone(Clone event) {
+        var n = PlayerInvoker.invoker(event.getNewPlayer());
+        var o = PlayerInvoker.invoker(event.getOldPlayer());
+        n.setStandCard(o.getStandCard());
     }
 }

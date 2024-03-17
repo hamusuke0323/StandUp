@@ -15,9 +15,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import org.jetbrains.annotations.Nullable;
 
-public record DeadlyQueenWantsToKnowNewBombInfoRsp(InteractionDataSerializer serializer, When when,
-                                                   What what) implements Packet {
-    public DeadlyQueenWantsToKnowNewBombInfoRsp(FriendlyByteBuf buf) {
+public record AskBombInfoRsp(InteractionDataSerializer serializer, When when,
+                             What what) implements Packet {
+    public AskBombInfoRsp(FriendlyByteBuf buf) {
         this(new InteractionDataSerializer(buf), buf.readEnum(When.class), buf.readEnum(What.class));
     }
 
@@ -48,7 +48,7 @@ public record DeadlyQueenWantsToKnowNewBombInfoRsp(InteractionDataSerializer ser
                     return;
                 }
 
-                stand.placeBomb(new BlockBomb(stand, DeadlyQueenWantsToKnowNewBombInfoRsp.this.when, DeadlyQueenWantsToKnowNewBombInfoRsp.this.what, result.getBlockPos()));
+                stand.placeBomb(new BlockBomb(stand, AskBombInfoRsp.this.when, AskBombInfoRsp.this.what, result.getBlockPos()));
             }
 
             @Override
@@ -59,7 +59,7 @@ public record DeadlyQueenWantsToKnowNewBombInfoRsp(InteractionDataSerializer ser
                     return;
                 }
 
-                stand.placeBomb(new EntityBomb(stand, DeadlyQueenWantsToKnowNewBombInfoRsp.this.when, DeadlyQueenWantsToKnowNewBombInfoRsp.this.what, entity));
+                stand.placeBomb(new EntityBomb(stand, AskBombInfoRsp.this.when, AskBombInfoRsp.this.what, entity));
             }
 
             @Override

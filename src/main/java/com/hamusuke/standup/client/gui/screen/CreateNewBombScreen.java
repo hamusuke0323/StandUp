@@ -3,7 +3,7 @@ package com.hamusuke.standup.client.gui.screen;
 import com.hamusuke.standup.client.gui.component.ComponentList;
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.InteractionDataSerializer;
-import com.hamusuke.standup.network.packet.c2s.DeadlyQueenWantsToKnowNewBombInfoRsp;
+import com.hamusuke.standup.network.packet.c2s.AskBombInfoRsp;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.What;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.When;
 import net.minecraft.client.gui.GuiGraphics;
@@ -85,6 +85,6 @@ public class CreateNewBombScreen extends Screen {
     private void done() {
         this.onClose();
 
-        NetworkManager.sendToServer(new DeadlyQueenWantsToKnowNewBombInfoRsp(new InteractionDataSerializer(this.result), this.when, this.what));
+        NetworkManager.sendToServer(new AskBombInfoRsp(new InteractionDataSerializer(this.result), this.when, this.what));
     }
 }

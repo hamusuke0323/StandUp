@@ -2,9 +2,9 @@ package com.hamusuke.standup.mixin;
 
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
-import com.hamusuke.standup.network.packet.s2c.StandAppearNotify;
 import com.hamusuke.standup.network.packet.s2c.StandCardSetNotify;
-import com.hamusuke.standup.network.packet.s2c.StandDisappearNotify;
+import com.hamusuke.standup.network.packet.s2c.StandDownRsp;
+import com.hamusuke.standup.network.packet.s2c.StandUpRsp;
 import com.hamusuke.standup.stand.stands.Stand;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -50,7 +50,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
 
         this.stand = stand;
         if (!this.level().isClientSide && this.stand.getOwner() != null) {
-            NetworkManager.sendToClient(new StandAppearNotify(this.stand.getOwner().getId(), this.stand.getId()), (ServerPlayer) (Object) this);
+            NetworkManager.sendToClient(new StandUpRsp(this.stand.getOwner().getId(), this.stand.getId()), (ServerPlayer) (Object) this);
         }
     }
 
@@ -63,8 +63,8 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
         var owner = this.stand.getOwner();
         this.stand = null;
 
-        if (!this.level().isClientSide && owner != null) {
-            NetworkManager.sendToClient(new StandDisappearNotify(owner.getId()), (ServerPlayer) owner);
+        if (!this.level().isClientSide) {
+            NetworkManager.sendToClient(new StandDownRsp(owner.getId()), (ServerPlayer) owner);
         }
     }
 

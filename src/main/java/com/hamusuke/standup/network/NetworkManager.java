@@ -28,23 +28,79 @@ public final class NetworkManager {
     }
 
     private static void registerC2SPackets() {
-        MAIN.messageBuilder(DeadlyQueenWantsToKnowNewBombInfoRsp.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(DeadlyQueenWantsToKnowNewBombInfoRsp::new).consumerNetworkThread(DeadlyQueenWantsToKnowNewBombInfoRsp::handle).add();
-        MAIN.messageBuilder(HoldOrReleaseOwnerReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(buf -> new HoldOrReleaseOwnerReq()).consumerNetworkThread(HoldOrReleaseOwnerReq::handle).add();
-        MAIN.messageBuilder(StandDownReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(buf -> new StandDownReq()).consumerNetworkThread(StandDownReq::handle).add();
-        MAIN.messageBuilder(StandMovementInputReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(StandMovementInputReq::new).consumerNetworkThread(StandMovementInputReq::handle).add();
-        MAIN.messageBuilder(SyncStandPosRotReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(SyncStandPosRotReq::new).consumerNetworkThread(SyncStandPosRotReq::handle).add();
-        MAIN.messageBuilder(StandOperationModeToggleReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(buf -> new StandOperationModeToggleReq()).consumerNetworkThread(StandOperationModeToggleReq::handle).add();
-        MAIN.messageBuilder(StandUpReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(StandUpReq::new).consumerNetworkThread(StandUpReq::handle).add();
-        MAIN.messageBuilder(UseStandAbilityReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER).encoder(Packet::write).decoder(UseStandAbilityReq::new).consumerNetworkThread(UseStandAbilityReq::handle).add();
+        MAIN.messageBuilder(AskBombInfoRsp.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(AskBombInfoRsp::new)
+                .consumerNetworkThread(Packet::handle)
+                .add();
+        MAIN.messageBuilder(HoldOrReleaseOwnerReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(buf -> new HoldOrReleaseOwnerReq())
+                .consumerNetworkThread(Packet::handle)
+                .add();
+        MAIN.messageBuilder(StandDownReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(buf -> new StandDownReq())
+                .consumerNetworkThread(Packet::handle)
+                .add();
+        MAIN.messageBuilder(StandMovementInputNotify.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(StandMovementInputNotify::new)
+                .consumerNetworkThread(Packet::handle)
+                .add();
+        MAIN.messageBuilder(StandOpModeToggleReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(buf -> new StandOpModeToggleReq())
+                .consumerNetworkThread(Packet::handle)
+                .add();
+        MAIN.messageBuilder(StandPosRotSyncNotify.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(StandPosRotSyncNotify::new)
+                .consumerNetworkThread(Packet::handle)
+                .add();
+        MAIN.messageBuilder(StandUpReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(StandUpReq::new)
+                .consumerNetworkThread(Packet::handle)
+                .add();
+        MAIN.messageBuilder(UseStandAbilityNotify.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(UseStandAbilityNotify::new)
+                .consumerNetworkThread(Packet::handle)
+                .add();
     }
 
     private static void registerS2CPackets() {
-        MAIN.messageBuilder(DeadlyQueenWantsToKnowNewBombInfoReq.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(DeadlyQueenWantsToKnowNewBombInfoReq::new).consumerNetworkThread(DeadlyQueenWantsToKnowNewBombInfoReq::handle).add();
-        MAIN.messageBuilder(HoldOrReleaseStandOwnerNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(HoldOrReleaseStandOwnerNotify::new).consumerNetworkThread(HoldOrReleaseStandOwnerNotify::handle).add();
-        MAIN.messageBuilder(StandAppearNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandAppearNotify::new).consumerNetworkThread(StandAppearNotify::handle).add();
-        MAIN.messageBuilder(StandCardSetNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandCardSetNotify::new).consumerNetworkThread(StandCardSetNotify::handle).add();
-        MAIN.messageBuilder(StandDisappearNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandDisappearNotify::new).consumerNetworkThread(StandDisappearNotify::handle).add();
-        MAIN.messageBuilder(StandOperationModeToggleNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT).encoder(Packet::write).decoder(StandOperationModeToggleNotify::new).consumerNetworkThread(StandOperationModeToggleNotify::handle).add();
+        MAIN.messageBuilder(AskBombInfoReq.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Packet::write)
+                .decoder(AskBombInfoReq::new)
+                .consumerNetworkThread(AskBombInfoReq::handle)
+                .add();
+        MAIN.messageBuilder(HoldOrReleaseOwnerNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Packet::write)
+                .decoder(HoldOrReleaseOwnerNotify::new)
+                .consumerNetworkThread(HoldOrReleaseOwnerNotify::handle)
+                .add();
+        MAIN.messageBuilder(StandCardSetNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Packet::write)
+                .decoder(StandCardSetNotify::new)
+                .consumerNetworkThread(StandCardSetNotify::handle)
+                .add();
+        MAIN.messageBuilder(StandDownRsp.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Packet::write)
+                .decoder(StandDownRsp::new)
+                .consumerNetworkThread(StandDownRsp::handle)
+                .add();
+        MAIN.messageBuilder(StandOpModeToggleNotify.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Packet::write)
+                .decoder(StandOpModeToggleNotify::new)
+                .consumerNetworkThread(StandOpModeToggleNotify::handle)
+                .add();
+        MAIN.messageBuilder(StandUpRsp.class, ID.get(), NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Packet::write)
+                .decoder(StandUpRsp::new)
+                .consumerNetworkThread(StandUpRsp::handle)
+                .add();
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -5,8 +5,8 @@ import com.google.common.collect.Sets;
 import com.hamusuke.standup.invoker.LivingEntityInvoker;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
-import com.hamusuke.standup.network.packet.s2c.HoldOrReleaseStandOwnerNotify;
-import com.hamusuke.standup.network.packet.s2c.StandOperationModeToggleNotify;
+import com.hamusuke.standup.network.packet.s2c.HoldOrReleaseOwnerNotify;
+import com.hamusuke.standup.network.packet.s2c.StandOpModeToggleNotify;
 import com.hamusuke.standup.stand.MultipleTarget;
 import com.hamusuke.standup.stand.ai.goal.AutoDoorGoal;
 import com.hamusuke.standup.stand.ai.goal.AutoFenceGateGoal;
@@ -352,7 +352,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     protected final void sendHoldInfoToClient() {
         if (this.getOwner() instanceof ServerPlayer serverPlayer) {
-            NetworkManager.sendToClient(new HoldOrReleaseStandOwnerNotify(this, this.isHoldingOwner()), serverPlayer);
+            NetworkManager.sendToClient(new HoldOrReleaseOwnerNotify(this, this.isHoldingOwner()), serverPlayer);
         }
     }
 
@@ -538,7 +538,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         this.mode = mode;
 
         if (!this.level().isClientSide && this.getOwner() instanceof ServerPlayer serverPlayer) {
-            NetworkManager.sendToClient(new StandOperationModeToggleNotify(this, this.mode), serverPlayer);
+            NetworkManager.sendToClient(new StandOpModeToggleNotify(this, this.mode), serverPlayer);
             serverPlayer.xxa = 0.0F;
             serverPlayer.yya = 0.0F;
             serverPlayer.zza = 0.0F;

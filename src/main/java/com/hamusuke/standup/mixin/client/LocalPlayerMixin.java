@@ -2,8 +2,8 @@ package com.hamusuke.standup.mixin.client;
 
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
-import com.hamusuke.standup.network.packet.c2s.StandMovementInputReq;
-import com.hamusuke.standup.network.packet.c2s.SyncStandPosRotReq;
+import com.hamusuke.standup.network.packet.c2s.StandMovementInputNotify;
+import com.hamusuke.standup.network.packet.c2s.StandPosRotSyncNotify;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -99,7 +99,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
                 this.getStand().setDeltaMovement(this.getStand().position().vectorTo(this.position()).normalize().scale(scale));
             }
 
-            NetworkManager.sendToServer(new StandMovementInputReq(this.getStand().xxa, this.getStand().zza, this.input.jumping, this.input.shiftKeyDown));
+            NetworkManager.sendToServer(new StandMovementInputNotify(this.getStand().xxa, this.getStand().zza, this.input.jumping, this.input.shiftKeyDown));
 
             this.yBobO = this.yBob;
             this.xBobO = this.xBob;
@@ -119,7 +119,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
                 this.xRotLast = this.getXRot();
             }
 
-            NetworkManager.sendToServer(new SyncStandPosRotReq(this.getStand().position(), this.getStand().getYRot(), this.getStand().getXRot(), this.isSprinting()));
+            NetworkManager.sendToServer(new StandPosRotSyncNotify(this.getStand().position(), this.getStand().getYRot(), this.getStand().getXRot(), this.isSprinting()));
         }
     }
 

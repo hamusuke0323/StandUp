@@ -8,8 +8,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import net.minecraftforge.fml.DistExecutor;
 
-public record StandDisappearNotify(int ownerId) implements Packet {
-    public StandDisappearNotify(FriendlyByteBuf buf) {
+public record StandDownRsp(int ownerId) implements Packet {
+    public StandDownRsp(FriendlyByteBuf buf) {
         this(buf.readVarInt());
     }
 

@@ -6,8 +6,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 
-public record SyncStandPosRotReq(Vec3 pos, float yRot, float xRot, boolean sprinting) implements Packet {
-    public SyncStandPosRotReq(FriendlyByteBuf buf) {
+public record StandPosRotSyncNotify(Vec3 pos, float yRot, float xRot, boolean sprinting) implements Packet {
+    public StandPosRotSyncNotify(FriendlyByteBuf buf) {
         this(buf.readVec3(), buf.readFloat(), buf.readFloat(), buf.readBoolean());
     }
 
