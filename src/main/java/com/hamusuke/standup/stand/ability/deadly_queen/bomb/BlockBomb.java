@@ -22,15 +22,15 @@ public class BlockBomb extends Bomb {
     @Override
     protected void explodeSelf() {
         var vec = this.blockPos.getCenter();
-        this.level.explode(null, this.getSource(), this.createDamageCalculator(), vec.x(), vec.y(), vec.z(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
+        this.level.explode(this.stand, this.getSource(), this.createDamageCalculator(), vec.x(), vec.y(), vec.z(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
         this.level.removeBlock(this.blockPos, true);
     }
 
     @Override
     protected void explodeTouchingEntity() {
-        this.level.getEntitiesOfClass(this.getType(), this.createAABB(), this::shouldExplode).forEach(entity -> {
-            this.level.explode(entity, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
-            entity.hurt(this.getSource(), Float.MAX_VALUE);
+        this.touchedEntities.addAll(this.level.getEntitiesOfClass(this.getType(), this.createAABB(), this::consideredTouching));
+        this.touchedEntities.forEach(entity -> {
+            this.level.explode(this.stand, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
         });
     }
 

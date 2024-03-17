@@ -21,14 +21,20 @@ public class EntityBomb extends Bomb {
 
     @Override
     protected void explodeTouchingEntity() {
-        this.level.getEntitiesOfClass(Entity.class, this.createAABB(), this::shouldExplode).forEach(entity -> {
-            this.level.explode(entity, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
+        this.touchedEntities.addAll(this.level.getEntitiesOfClass(Entity.class, this.createAABB(), this::shouldExplode));
+        this.touchedEntities.forEach(entity -> {
+            this.level.explode(this.stand, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
         });
     }
 
     @Override
     protected AABB createAABB() {
         return this.target.getBoundingBox();
+    }
+
+    @Override
+    protected boolean consideredTouching(Entity entity) {
+        return entity != this.target && super.consideredTouching(entity);
     }
 
     @Override

@@ -20,12 +20,15 @@ public class IgnitionSwitchItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level p_41432_, Player p_41433_, InteractionHand p_41434_) {
         var itemstack = p_41433_.getItemInHand(p_41434_);
+        if (!p_41432_.isClientSide) {
+            if (p_41433_ instanceof PlayerInvoker invoker && invoker.getStand() instanceof DeadlyQueen queen) {
+                queen.igniteBomb();
+            }
 
-        if (p_41433_ instanceof PlayerInvoker invoker && invoker.getStand() instanceof DeadlyQueen queen) {
-            queen.igniteBomb();
+            p_41433_.getInventory().removeItem(itemstack);
+            p_41433_.containerMenu.broadcastChanges();
         }
 
-        itemstack.setCount(0);
         return InteractionResultHolder.sidedSuccess(itemstack, p_41432_.isClientSide());
     }
 

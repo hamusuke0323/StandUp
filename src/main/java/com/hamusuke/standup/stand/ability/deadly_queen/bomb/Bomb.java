@@ -8,6 +8,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
@@ -16,6 +17,9 @@ import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level.ExplosionInteraction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.apache.commons.compress.utils.Sets;
+
+import java.util.Set;
 
 import static com.hamusuke.standup.StandUp.MOD_ID;
 import static com.hamusuke.standup.registry.RegisteredSoundEvents.CLICK;
@@ -29,6 +33,7 @@ public abstract class Bomb {
     protected final ServerLevel level;
     protected final When explodeWhen;
     protected final What whatExplodes;
+    protected final Set<Entity> touchedEntities = Sets.newHashSet();
     protected boolean ignited;
     protected boolean exploded;
 
@@ -44,11 +49,13 @@ public abstract class Bomb {
             return;
         }
 
-        var touchingEntities = this.level.getEntitiesOfClass(this.getType(), this.createAABB(), this::shouldExplode);
+        var touchingEntities = this.level.getEntitiesOfClass(this.getType(), this.createAABB(), this::consideredTouching);
         if (touchingEntities.isEmpty()) {
             return;
         }
 
+        this.touchedEntities.clear();
+        this.touchedEntities.addAll(touchingEntities);
         this.ignite();
     }
 
@@ -137,6 +144,10 @@ public abstract class Bomb {
         return (Class<T>) Entity.class;
     }
 
+    protected boolean consideredTouching(Entity entity) {
+        return entity != this.stand && entity != this.stand.getOwner();
+    }
+
     protected boolean shouldExplode(Entity entity) {
         return entity != this.stand && entity != this.stand.getOwner();
     }
@@ -194,7 +205,7 @@ public abstract class Bomb {
 
         @Override
         public float getEntityDamageAmount(Explosion p_310428_, Entity p_310135_) {
-            return this.bomb.shouldExplode(p_310135_) ? Float.MAX_VALUE : 0.0F;
+            return this.bomb.shouldExplode(p_310135_) ? super.getEntityDamageAmount(p_310428_, p_310135_) * Mth.PI : 0.0F;
         }
     }
 }
