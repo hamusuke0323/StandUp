@@ -21,22 +21,15 @@ public class StandOwnerHurtTargetGoal extends TargetGoal {
 
     @Override
     public boolean canUse() {
-        if (this.stand.getOwner() != null) {
-            this.ownerLastHurt = this.stand.getOwner().getLastHurtMob();
-            int timestamp = this.stand.getOwner().getLastHurtMobTimestamp();
-            return timestamp != this.timestamp && this.canAttack(this.ownerLastHurt, TargetingConditions.DEFAULT);
-        } else {
-            return false;
-        }
+        this.ownerLastHurt = this.stand.getOwner().getLastHurtMob();
+        int timestamp = this.stand.getOwner().getLastHurtMobTimestamp();
+        return timestamp != this.timestamp && this.canAttack(this.ownerLastHurt, TargetingConditions.DEFAULT);
     }
 
     @Override
     public void start() {
         this.stand.addTarget(this.ownerLastHurt);
-        var owner = this.stand.getOwner();
-        if (owner != null) {
-            this.timestamp = owner.getLastHurtMobTimestamp();
-        }
+        this.timestamp = this.stand.getOwner().getLastHurtMobTimestamp();
 
         super.start();
     }

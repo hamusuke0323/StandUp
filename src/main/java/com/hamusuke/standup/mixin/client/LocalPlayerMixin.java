@@ -113,7 +113,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
         }
     }
 
-    @Inject(method = "sendPosition", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "sendPosition", at = @At("HEAD"))
     private void sendPosition(CallbackInfo ci) {
         if (this.isControllingStand()) {
             double yd = this.getYRot() - this.yRotLast;

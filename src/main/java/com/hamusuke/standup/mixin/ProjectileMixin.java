@@ -8,6 +8,7 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
@@ -23,7 +24,7 @@ public abstract class ProjectileMixin extends Entity {
     @Nullable
     public abstract Entity getOwner();
 
-    @ModifyVariable(method = "shootFromRotation", at = @At("HEAD"))
+    @ModifyVariable(method = "shootFromRotation", at = @At("HEAD"), argsOnly = true)
     private Entity shootFromRotation$Entity(Entity entity) {
         if (this.isControllingStand()) {
             var stand = this.getStand();
@@ -34,7 +35,7 @@ public abstract class ProjectileMixin extends Entity {
         return entity;
     }
 
-    @ModifyVariable(method = "shootFromRotation", at = @At("HEAD"), ordinal = 0)
+    @ModifyVariable(method = "shootFromRotation", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float shootFromRotation$XRot(float xRot) {
         if (this.isControllingStand()) {
             return this.getStand().getXRot();
@@ -43,7 +44,7 @@ public abstract class ProjectileMixin extends Entity {
         return xRot;
     }
 
-    @ModifyVariable(method = "shootFromRotation", at = @At("HEAD"), ordinal = 1)
+    @ModifyVariable(method = "shootFromRotation", at = @At("HEAD"), ordinal = 1, argsOnly = true)
     private float shoot(float yRot) {
         if (this.isControllingStand()) {
             return this.getStand().getYRot();
@@ -52,10 +53,12 @@ public abstract class ProjectileMixin extends Entity {
         return yRot;
     }
 
+    @Unique
     private Stand getStand() {
         return PlayerInvoker.invoker(this.getOwner()).getStand();
     }
 
+    @Unique
     private boolean isControllingStand() {
         return this.getOwner() instanceof PlayerInvoker invoker && invoker.isControllingStand();
     }

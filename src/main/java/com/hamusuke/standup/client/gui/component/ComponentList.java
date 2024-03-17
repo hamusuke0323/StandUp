@@ -69,7 +69,7 @@ public class ComponentList extends ContainerObjectSelectionList<ComponentList.En
     }
 
     @OnlyIn(Dist.CLIENT)
-    public class ButtonEntry extends Entry {
+    public static class ButtonEntry extends Entry {
         final AbstractButton button;
 
         public ButtonEntry(AbstractButton button) {

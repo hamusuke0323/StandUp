@@ -16,7 +16,7 @@ public abstract class TickRateManagerMixin {
 
     @Inject(method = "isEntityFrozen", at = @At("RETURN"), cancellable = true)
     private void isEntityFrozen(Entity p_311574_, CallbackInfoReturnable<Boolean> cir) {
-        if (p_311574_ instanceof Stand stand && stand.getOwner() != null && !this.isEntityFrozen(stand.getOwner())) {
+        if (p_311574_ instanceof Stand stand && !this.isEntityFrozen(stand.getOwner())) {
             cir.setReturnValue(false);
         }
     }

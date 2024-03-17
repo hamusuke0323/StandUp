@@ -206,7 +206,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         super.tick();
         this.noPhysics = false;
 
-        this.targets.removeIf(livingEntity -> (livingEntity instanceof Mob mob && mob.getTarget() != this.getOwner()) || !EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(livingEntity) || livingEntity == this.getOwner() || this.getOwner() == null || !livingEntity.isAlive() || !this.getOwner().closerThan(livingEntity, this.maxMovableDistanceFromPlayer()));
+        this.targets.removeIf(livingEntity -> (livingEntity instanceof Mob mob && mob.getTarget() != this.getOwner()) || !EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(livingEntity) || livingEntity == this.getOwner() || !livingEntity.isAlive() || !this.getOwner().closerThan(livingEntity, this.maxMovableDistanceFromPlayer()));
 
         if (!this.isFollowingOwner()) {
             this.setNoGravity(true);

@@ -49,7 +49,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
         }
 
         this.stand = stand;
-        if (!this.level().isClientSide && this.stand.getOwner() != null) {
+        if (!this.level().isClientSide) {
             NetworkManager.sendToClient(new StandUpRsp(this.stand.getOwner().getId(), this.stand.getId()), (ServerPlayer) (Object) this);
         }
     }

@@ -27,7 +27,7 @@ public class StarPlatinum extends Stand {
 
         this.targetSelector.addGoal(1, new StandOwnerHurtTargetGoal(this));
         this.targetSelector.addGoal(2, new StandMultipleAttackableTargetsGoal<>(this, LivingEntity.class, false, livingEntity -> {
-            return this.getOwner() != null && !this.getOwner().isCreative() && livingEntity instanceof Enemy;
+            return !this.getOwner().isCreative() && livingEntity instanceof Enemy;
         }));
     }
 
