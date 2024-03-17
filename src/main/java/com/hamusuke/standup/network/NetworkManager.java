@@ -58,6 +58,11 @@ public final class NetworkManager {
                 .decoder(StandPosRotSyncNotify::new)
                 .consumerNetworkThread(Packet::handle)
                 .add();
+        MAIN.messageBuilder(StandRotateHeadNotify.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(StandRotateHeadNotify::new)
+                .consumerNetworkThread(Packet::handle)
+                .add();
         MAIN.messageBuilder(StandUpReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(Packet::write)
                 .decoder(StandUpReq::new)

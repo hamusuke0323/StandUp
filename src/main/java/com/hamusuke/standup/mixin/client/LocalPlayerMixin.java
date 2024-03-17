@@ -4,6 +4,7 @@ import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.c2s.StandMovementInputNotify;
 import com.hamusuke.standup.network.packet.c2s.StandPosRotSyncNotify;
+import com.hamusuke.standup.network.packet.c2s.StandRotateHeadNotify;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -19,6 +20,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -55,6 +57,9 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
     @Shadow
     @Final
     public ClientPacketListener connection;
+
+    @Unique
+    protected float yHeadRotLast;
 
     public LocalPlayerMixin(ClientLevel p_250460_, GameProfile p_249912_) {
         super(p_250460_, p_249912_);
@@ -120,6 +125,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements P
             }
 
             NetworkManager.sendToServer(new StandPosRotSyncNotify(this.getStand().position(), this.getStand().getYRot(), this.getStand().getXRot(), this.isSprinting()));
+
+            if (this.getStand().getYHeadRot() - this.yHeadRotLast != 0.0F) {
+                NetworkManager.sendToServer(new StandRotateHeadNotify(this.getStand().getYHeadRot()));
+                this.yHeadRotLast = this.getStand().getYHeadRot();
+            }
         }
     }
 
