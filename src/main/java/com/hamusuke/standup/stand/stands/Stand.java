@@ -187,6 +187,10 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         return this.getOwner().level().dimension() == this.level().dimension() && super.isAlive();
     }
 
+    public boolean isHoldableOwner() {
+        return this.getStandCard() != StandCard.EMPTY;
+    }
+
     @Override
     public ItemStack getPickedResult(HitResult target) {
         return null;
@@ -323,7 +327,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     }
 
     public void startHoldingOwner() {
-        if (this.isHoldingOwner() || this.getOwner().isPassenger()) {
+        if (!this.isHoldableOwner() || this.isHoldingOwner() || this.getOwner().isPassenger()) {
             return;
         }
 
@@ -353,7 +357,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     }
 
     protected void holdOwnerTick() {
-        if (!this.isHoldingOwner()) {
+        if (!this.isHoldingOwner() || !this.isHoldableOwner()) {
             return;
         }
 

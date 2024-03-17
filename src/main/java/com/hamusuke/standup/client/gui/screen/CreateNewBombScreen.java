@@ -1,5 +1,6 @@
 package com.hamusuke.standup.client.gui.screen;
 
+import com.hamusuke.standup.client.gui.component.ComponentList;
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.InteractionDataSerializer;
 import com.hamusuke.standup.network.packet.c2s.DeadlyQueenWantsToKnowNewBombInfoRsp;
@@ -7,6 +8,7 @@ import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.What;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.When;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -21,10 +23,13 @@ import static com.hamusuke.standup.StandUp.MOD_ID;
 @OnlyIn(Dist.CLIENT)
 public class CreateNewBombScreen extends Screen {
     private static final Component TITLE = Component.translatable(MOD_ID + ".screen.bomb");
+    private static final Component WHEN = Component.translatable(MOD_ID + ".screen.bomb.when");
+    private static final Component WHAT = Component.translatable(MOD_ID + ".screen.bomb.what");
     private final HitResult result;
     private final Component targetDesc;
-    private When when = When.PUSH_SWITCH;
-    private What what = What.SELF;
+    private ComponentList list;
+    private When when = When.TOUCH;
+    private What what = What.TOUCHING_ENTITY;
 
     public CreateNewBombScreen(HitResult result) {
         super(TITLE);
@@ -45,6 +50,15 @@ public class CreateNewBombScreen extends Screen {
 
     @Override
     protected void init() {
+        double scroll = this.list == null ? 0.0D : this.list.getScrollAmount();
+        this.list = this.addRenderableWidget(new ComponentList(this.minecraft, this.width, this.height - 40 - 20, 40, 20));
+        this.list.setScrollAmount(scroll);
+
+        this.list.addString(WHEN);
+        this.list.addButton(CycleButton.builder(When::getDesc).withValues(When.values()).withInitialValue(this.when).displayOnlyValue().create(0, 0, 0, 20, Component.empty(), (cycleButton, when1) -> this.when = when1));
+        this.list.addString(WHAT);
+        this.list.addButton(CycleButton.builder(What::getDesc).withValues(What.values()).withInitialValue(this.what).displayOnlyValue().create(0, 0, 0, 20, Component.empty(), (cycleButton, what1) -> this.what = what1));
+
         this.addRenderableWidget(Button
                 .builder(CommonComponents.GUI_CANCEL, button -> this.onClose())
                 .bounds(0, this.height - 20, this.width / 2, 20)
@@ -59,8 +73,13 @@ public class CreateNewBombScreen extends Screen {
     public void render(GuiGraphics p_281549_, int p_281550_, int p_282878_, float p_282465_) {
         super.render(p_281549_, p_281550_, p_282878_, p_282465_);
 
-        p_281549_.drawCenteredString(this.font, this.getTitle(), this.width / 2, 20, 16777215);
-        p_281549_.drawCenteredString(this.font, this.targetDesc, this.width / 2, 40, 16777215);
+        p_281549_.drawCenteredString(this.font, this.getTitle(), this.width / 2, 8, 16777215);
+        p_281549_.drawCenteredString(this.font, this.targetDesc, this.width / 2, 26, 16777215);
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics p_283688_, int p_299421_, int p_298679_, float p_297268_) {
+        this.renderDirtBackground(p_283688_);
     }
 
     private void done() {

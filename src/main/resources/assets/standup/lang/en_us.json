@@ -6,6 +6,8 @@
   "standup.what.self": "This Bomb Explodes",
   "standup.what.touching": "Touching Entities Explode",
   "standup.screen.bomb": "Create New Bomb",
+  "standup.screen.bomb.when": "When this bomb explodes?",
+  "standup.screen.bomb.what": "What should explode?",
   "standup.config.title": "Stand Up Config",
   "standup.config.canOpenDoor": "Stands can open doors",
   "standup.config.canOpenGate": "Stands can open fence gates",

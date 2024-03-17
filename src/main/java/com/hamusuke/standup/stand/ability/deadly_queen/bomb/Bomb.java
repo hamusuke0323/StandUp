@@ -149,10 +149,14 @@ public abstract class Bomb {
         PUSH_SWITCH(PUSH_SWITCH_DESC),
         TOUCH(TOUCH_DESC);
 
-        public final Component desc;
+        private final Component desc;
 
         When(Component desc) {
             this.desc = desc;
+        }
+
+        public Component getDesc() {
+            return this.desc;
         }
     }
 
@@ -160,10 +164,14 @@ public abstract class Bomb {
         SELF(SELF_DESC),
         TOUCHING_ENTITY(TOUCHING_DESC);
 
-        public final Component desc;
+        private final Component desc;
 
         What(Component desc) {
             this.desc = desc;
+        }
+
+        public Component getDesc() {
+            return this.desc;
         }
     }
 
