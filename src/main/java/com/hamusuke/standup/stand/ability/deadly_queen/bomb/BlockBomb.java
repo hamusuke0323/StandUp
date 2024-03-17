@@ -4,6 +4,7 @@ import com.hamusuke.standup.stand.stands.DeadlyQueen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
@@ -31,6 +32,9 @@ public class BlockBomb extends Bomb {
         this.touchedEntities.addAll(this.level.getEntitiesOfClass(this.getType(), this.createAABB(), this::consideredTouching));
         this.touchedEntities.forEach(entity -> {
             this.level.explode(this.stand, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
+            if (!(entity instanceof LivingEntity)) {
+                entity.kill();
+            }
         });
     }
 

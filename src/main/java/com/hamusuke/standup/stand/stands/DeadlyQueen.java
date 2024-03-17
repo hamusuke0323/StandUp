@@ -109,9 +109,15 @@ public class DeadlyQueen extends Stand {
 
     @Override
     public void onInteractAtAir() {
-        if (this.bomb != null && this.getOwner().isShiftKeyDown() && this.bomb.getExplodeWhen() == When.PUSH_SWITCH) {
+        if (this.bomb != null && !this.getOwner().isShiftKeyDown() && this.bomb.getExplodeWhen() == When.PUSH_SWITCH) {
             this.bomb.ignite();
-        } else if (this.sheerHeartAttack == null) {
+        }
+
+        if (!this.getOwner().isShiftKeyDown()) {
+            return;
+        }
+
+        if (this.sheerHeartAttack == null) {
             this.sheerHeartAttack = new SheerHeartAttack(this);
             this.sheerHeartAttack.setPos(this.position());
             this.level().addFreshEntity(this.sheerHeartAttack);
