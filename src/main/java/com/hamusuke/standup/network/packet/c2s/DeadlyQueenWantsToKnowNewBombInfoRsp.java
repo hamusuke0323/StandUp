@@ -9,7 +9,6 @@ import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.What;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.When;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.EntityBomb;
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -54,7 +53,7 @@ public record DeadlyQueenWantsToKnowNewBombInfoRsp(InteractionDataSerializer ser
 
             @Override
             public void atEntity(int id, Vec3 location) {
-                var entity = Minecraft.getInstance().level.getEntity(id);
+                var entity = context.getSender().serverLevel().getEntity(id);
                 var stand = this.getStand();
                 if (entity == null || stand == null) {
                     return;

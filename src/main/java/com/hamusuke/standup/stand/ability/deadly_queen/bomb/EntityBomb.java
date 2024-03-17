@@ -16,7 +16,7 @@ public class EntityBomb extends Bomb {
 
     @Override
     protected void explodeSelf() {
-        this.level.explode(this.target, this.getSource(), this.createDamageCalculator(), this.target.getX(), this.target.getY(), this.target.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
+        this.level.explode(this.stand, this.getSource(), this.createDamageCalculator(), this.target.getX(), this.target.getY(), this.target.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
     }
 
     @Override

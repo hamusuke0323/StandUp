@@ -194,7 +194,7 @@ public abstract class Bomb {
 
         @Override
         public float getEntityDamageAmount(Explosion p_310428_, Entity p_310135_) {
-            return this.bomb.shouldExplode(p_310135_) ? super.getEntityDamageAmount(p_310428_, p_310135_) : Float.MAX_VALUE;
+            return this.bomb.shouldExplode(p_310135_) ? Float.MAX_VALUE : 0.0F;
         }
     }
 }
