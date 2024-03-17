@@ -1,4 +1,4 @@
-package com.hamusuke.standup.stand.ability.deadly_queen;
+package com.hamusuke.standup.stand.ability.deadly_queen.bomb;
 
 import com.hamusuke.standup.registry.RegisteredSoundEvents;
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 import static com.hamusuke.standup.StandUp.MOD_ID;
+import static com.hamusuke.standup.registry.RegisteredSoundEvents.CLICK;
 
 public abstract class Bomb {
     private static final Component PUSH_SWITCH_DESC = Component.translatable(MOD_ID + ".when.switch");
@@ -28,6 +29,7 @@ public abstract class Bomb {
     protected final ServerLevel level;
     protected final When explodeWhen;
     protected final What whatExplodes;
+    protected boolean ignited;
     protected boolean exploded;
 
     protected Bomb(DeadlyQueen stand, When explodeWhen, What whatExplodes) {
@@ -38,7 +40,7 @@ public abstract class Bomb {
     }
 
     public void tick() {
-        if (this.explodeWhen == When.PUSH_SWITCH) {
+        if (this.explodeWhen == When.PUSH_SWITCH || this.alreadyIgnited()) {
             return;
         }
 
@@ -47,13 +49,29 @@ public abstract class Bomb {
             return;
         }
 
-        this.explode();
+        this.ignite();
     }
 
     public void ignite() {
-        if (this.explodeWhen == When.PUSH_SWITCH) {
-            this.explode();
+        if (this.ignited) {
+            return;
         }
+
+        this.ignited = true;
+        this.playIgnitionSound();
+        this.setTimer();
+    }
+
+    protected void setTimer() {
+        this.stand.getBombTimer().start(10);
+    }
+
+    protected void playIgnitionSound() {
+        this.stand.level().playSound(null, this.stand.getX(), this.stand.getY(), this.stand.getZ(), CLICK.get(), this.stand.getSoundSource(), 5.0F, 1.0F);
+    }
+
+    public boolean alreadyIgnited() {
+        return this.ignited;
     }
 
     public When getExplodeWhen() {
@@ -64,7 +82,11 @@ public abstract class Bomb {
         return this.whatExplodes;
     }
 
-    protected void explode() {
+    public void explode() {
+        if (!this.ignited || this.exploded) {
+            return;
+        }
+
         this.exploded = true;
 
         switch (this.whatExplodes) {
@@ -164,7 +186,7 @@ public abstract class Bomb {
 
         @Override
         public float getEntityDamageAmount(Explosion p_310428_, Entity p_310135_) {
-            return this.bomb.shouldExplode(p_310135_) ? super.getEntityDamageAmount(p_310428_, p_310135_) : 0.0F;
+            return this.bomb.shouldExplode(p_310135_) ? super.getEntityDamageAmount(p_310428_, p_310135_) : Float.MAX_VALUE;
         }
     }
 }

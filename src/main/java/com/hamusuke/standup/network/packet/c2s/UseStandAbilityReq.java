@@ -32,7 +32,7 @@ public record UseStandAbilityReq(InteractionDataSerializer serializer) implement
             @Override
             public void atBlock(BlockHitResult result) {
                 var sender = context.getSender();
-                if (sender instanceof PlayerInvoker invoker && invoker.isControllingStand()) {
+                if (sender instanceof PlayerInvoker invoker && invoker.isStandAlive()) {
                     invoker.getStand().onInteractAtBlock(result, true);
                 }
             }
@@ -40,7 +40,7 @@ public record UseStandAbilityReq(InteractionDataSerializer serializer) implement
             @Override
             public void atEntity(int id, Vec3 location) {
                 var sender = context.getSender();
-                if (sender instanceof PlayerInvoker invoker && invoker.isControllingStand()) {
+                if (sender instanceof PlayerInvoker invoker && invoker.isStandAlive()) {
                     var entity = sender.level().getEntity(id);
                     if (entity == null) {
                         return;
@@ -53,7 +53,7 @@ public record UseStandAbilityReq(InteractionDataSerializer serializer) implement
             @Override
             public void atAir() {
                 var sender = context.getSender();
-                if (sender instanceof PlayerInvoker invoker && invoker.isControllingStand()) {
+                if (sender instanceof PlayerInvoker invoker && invoker.isStandAlive()) {
                     invoker.getStand().onInteractAtAir();
                 }
             }

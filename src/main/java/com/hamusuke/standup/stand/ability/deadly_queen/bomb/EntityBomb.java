@@ -1,4 +1,4 @@
-package com.hamusuke.standup.stand.ability.deadly_queen;
+package com.hamusuke.standup.stand.ability.deadly_queen.bomb;
 
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
 import net.minecraft.world.damagesource.DamageSource;
@@ -17,14 +17,12 @@ public class EntityBomb extends Bomb {
     @Override
     protected void explodeSelf() {
         this.level.explode(this.target, this.getSource(), this.createDamageCalculator(), this.target.getX(), this.target.getY(), this.target.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
-        this.target.discard();
     }
 
     @Override
     protected void explodeTouchingEntity() {
         this.level.getEntitiesOfClass(Entity.class, this.createAABB(), this::shouldExplode).forEach(entity -> {
             this.level.explode(entity, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
-            entity.discard();
         });
     }
 

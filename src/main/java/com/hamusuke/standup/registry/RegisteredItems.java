@@ -1,5 +1,6 @@
 package com.hamusuke.standup.registry;
 
+import com.hamusuke.standup.world.item.IgnitionSwitchItem;
 import com.hamusuke.standup.world.item.StandCardItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
@@ -12,4 +13,5 @@ public class RegisteredItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
 
     public static final RegistryObject<Item> STAND_CARD = ITEMS.register("stand_card", StandCardItem::new);
+    public static final RegistryObject<Item> IGNITION_SWITCH = ITEMS.register("ignition_switch", IgnitionSwitchItem::new);
 }

@@ -4,10 +4,10 @@ import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.packet.InteractionDataSerializer;
 import com.hamusuke.standup.network.packet.InteractionDataSerializer.Handler;
 import com.hamusuke.standup.network.packet.Packet;
-import com.hamusuke.standup.stand.ability.deadly_queen.BlockBomb;
-import com.hamusuke.standup.stand.ability.deadly_queen.Bomb.What;
-import com.hamusuke.standup.stand.ability.deadly_queen.Bomb.When;
-import com.hamusuke.standup.stand.ability.deadly_queen.EntityBomb;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.BlockBomb;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.What;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.When;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.EntityBomb;
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
@@ -35,7 +35,7 @@ public record DeadlyQueenWantsToKnowNewBombInfoRsp(InteractionDataSerializer ser
             @Nullable
             private DeadlyQueen getStand() {
                 var sender = context.getSender();
-                if (sender instanceof PlayerInvoker invoker && invoker.isControllingStand() && invoker.getStand() instanceof DeadlyQueen deadlyQueen) {
+                if (sender instanceof PlayerInvoker invoker && invoker.isStandAlive() && invoker.getStand() instanceof DeadlyQueen deadlyQueen) {
                     return deadlyQueen;
                 }
 

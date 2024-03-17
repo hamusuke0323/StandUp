@@ -1,9 +1,12 @@
 package com.hamusuke.standup.stand.stands;
 
-import net.minecraft.world.entity.EntityType;
+import static com.hamusuke.standup.registry.RegisteredEntities.SHEER_HEART_ATTACK;
 
-public class SheerHeartAttack extends Stand {
-    public SheerHeartAttack(EntityType<? extends SheerHeartAttack> type, DeadlyQueen stand) {
-        super(type, stand.level(), stand.owner, stand.standCard);
+public class SheerHeartAttack extends PartStand<DeadlyQueen> {
+    protected DeadlyQueen parent;
+
+    public SheerHeartAttack(DeadlyQueen parent) {
+        super(SHEER_HEART_ATTACK.get(), parent);
+        this.parent = parent;
     }
 }

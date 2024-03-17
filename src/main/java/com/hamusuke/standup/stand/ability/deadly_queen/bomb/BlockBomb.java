@@ -1,4 +1,4 @@
-package com.hamusuke.standup.stand.ability.deadly_queen;
+package com.hamusuke.standup.stand.ability.deadly_queen.bomb;
 
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
 import net.minecraft.core.BlockPos;
@@ -23,13 +23,14 @@ public class BlockBomb extends Bomb {
     protected void explodeSelf() {
         var vec = this.blockPos.getCenter();
         this.level.explode(null, this.getSource(), this.createDamageCalculator(), vec.x(), vec.y(), vec.z(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
+        this.level.removeBlock(this.blockPos, true);
     }
 
     @Override
     protected void explodeTouchingEntity() {
         this.level.getEntitiesOfClass(this.getType(), this.createAABB(), this::shouldExplode).forEach(entity -> {
             this.level.explode(entity, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
-            entity.discard();
+            entity.hurt(this.getSource(), Float.MAX_VALUE);
         });
     }
 
@@ -51,7 +52,7 @@ public class BlockBomb extends Bomb {
             @Override
             public boolean shouldBlockExplode(Explosion p_46094_, BlockGetter p_46095_, BlockPos p_46096_, BlockState p_46097_, float p_46098_) {
                 if (BlockBomb.this.whatExplodes == What.SELF) {
-                    return BlockBomb.this.blockPos.equals(p_46096_);
+                    return false;
                 }
 
                 return super.shouldBlockExplode(p_46094_, p_46095_, p_46096_, p_46097_, p_46098_);

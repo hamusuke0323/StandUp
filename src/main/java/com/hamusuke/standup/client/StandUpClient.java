@@ -2,6 +2,7 @@ package com.hamusuke.standup.client;
 
 import com.hamusuke.standup.client.gui.screen.CardMenuScreen;
 import com.hamusuke.standup.client.gui.screen.ConfigScreen;
+import com.hamusuke.standup.client.renderer.entity.SHARenderer;
 import com.hamusuke.standup.client.renderer.entity.StandRenderer;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
@@ -31,8 +32,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.lwjgl.glfw.GLFW;
 
 import static com.hamusuke.standup.StandUp.MOD_ID;
-import static com.hamusuke.standup.registry.RegisteredEntities.SLIM_STAND_TYPE;
-import static com.hamusuke.standup.registry.RegisteredEntities.STAND_TYPE;
+import static com.hamusuke.standup.registry.RegisteredEntities.*;
 import static com.hamusuke.standup.registry.RegisteredMenus.CARD_MENU;
 
 @OnlyIn(Dist.CLIENT)
@@ -83,6 +83,17 @@ public class StandUpClient {
         }
     }
 
+    private static void requestToStandUp() {
+        NetworkManager.sendToServer(new StandUpReq(StandCardItem.getStandCardFrom(PlayerInvoker.invoker(mc.player).getStandCard()).isSlim(mc.player)));
+    }
+
+    @SubscribeEvent
+    static void onEntityRenderer(final RegisterRenderers event) {
+        event.registerEntityRenderer(STAND_TYPE.get(), context -> new StandRenderer(context, false));
+        event.registerEntityRenderer(SLIM_STAND_TYPE.get(), context -> new StandRenderer(context, true));
+        event.registerEntityRenderer(SHEER_HEART_ATTACK.get(), SHARenderer::new);
+    }
+
     @SubscribeEvent
     public void onTick(final ClientTickEvent event) {
         if (event.phase == Phase.END) {
@@ -91,7 +102,7 @@ public class StandUpClient {
                 if (invoker.isStandAlive()) {
                     NetworkManager.sendToServer(new StandDownReq());
                 } else {
-                    NetworkManager.sendToServer(new StandUpReq(StandCardItem.getStandCardFrom(invoker.getStandCard()).isSlim(mc.player)));
+                    requestToStandUp();
                 }
             }
 
@@ -103,16 +114,15 @@ public class StandUpClient {
                 NetworkManager.sendToServer(new StandOperationModeToggleReq());
             }
 
-            while (USE_STAND_ABILITY.consumeClick() && PlayerInvoker.invoker(mc.player).isControllingStand()) {
+            while (USE_STAND_ABILITY.consumeClick()) {
+                var invoker = PlayerInvoker.invoker(mc.player);
+                if (!invoker.isStandAlive()) {
+                    requestToStandUp();
+                }
+
                 NetworkManager.sendToServer(new UseStandAbilityReq(mc.hitResult));
             }
         }
-    }
-
-    @SubscribeEvent
-    static void onEntityRenderer(final RegisterRenderers event) {
-        event.registerEntityRenderer(STAND_TYPE.get(), context -> new StandRenderer(context, false));
-        event.registerEntityRenderer(SLIM_STAND_TYPE.get(), context -> new StandRenderer(context, true));
     }
 
     @SubscribeEvent

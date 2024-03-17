@@ -229,20 +229,22 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
         super.aiStep();
 
-        var aabb = this.getBoundingBox().inflate(5.0, 2.5, 5.0);
-        var list = this.level().getEntities(this, aabb);
-        var list1 = Lists.<Entity>newArrayList();
+        if (this.canPickUpLoot()) {
+            var aabb = this.getBoundingBox().inflate(5.0, 2.5, 5.0);
+            var list = this.level().getEntities(this, aabb);
+            var list1 = Lists.<Entity>newArrayList();
 
-        for (var entity : list) {
-            if (entity.getType() == EntityType.EXPERIENCE_ORB) {
-                list1.add(entity);
-            } else if (!entity.isRemoved()) {
-                entity.playerTouch(this.getOwner());
+            for (var entity : list) {
+                if (entity.getType() == EntityType.EXPERIENCE_ORB) {
+                    list1.add(entity);
+                } else if (!entity.isRemoved()) {
+                    entity.playerTouch(this.getOwner());
+                }
             }
-        }
 
-        if (!list1.isEmpty()) {
-            Util.getRandom(list1, this.random).playerTouch(this.getOwner());
+            if (!list1.isEmpty()) {
+                Util.getRandom(list1, this.random).playerTouch(this.getOwner());
+            }
         }
     }
 
@@ -641,7 +643,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     public InteractionResult interactAt(Player p_19980_, Vec3 p_19981_, InteractionHand p_19982_) {
-        if (p_19980_ != this.getOwner()) {
+        if (p_19980_ != this.getOwner() || !this.getOwner().isShiftKeyDown()) {
             return InteractionResult.PASS;
         }
 

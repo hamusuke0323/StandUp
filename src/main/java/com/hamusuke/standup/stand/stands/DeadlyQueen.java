@@ -2,35 +2,52 @@ package com.hamusuke.standup.stand.stands;
 
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.s2c.DeadlyQueenWantsToKnowNewBombInfoReq;
-import com.hamusuke.standup.stand.ability.deadly_queen.BlockBomb;
-import com.hamusuke.standup.stand.ability.deadly_queen.Bomb;
-import com.hamusuke.standup.stand.ability.deadly_queen.Bomb.When;
-import com.hamusuke.standup.stand.ability.deadly_queen.EntityBomb;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.BlockBomb;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.When;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.EntityBomb;
 import com.hamusuke.standup.stand.ai.goal.StandRushAttackGoal;
 import com.hamusuke.standup.stand.ai.goal.target.StandMultipleAttackableTargetsGoal;
 import com.hamusuke.standup.stand.ai.goal.target.StandOwnerHurtTargetGoal;
 import com.hamusuke.standup.stand.card.StandCard;
+import com.hamusuke.standup.util.TickTimer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import static com.hamusuke.standup.StandUp.MOD_ID;
+import static com.hamusuke.standup.registry.RegisteredItems.IGNITION_SWITCH;
 import static com.hamusuke.standup.registry.RegisteredSoundEvents.APPEAR;
-import static com.hamusuke.standup.registry.RegisteredSoundEvents.CLICK;
 
 public class DeadlyQueen extends Stand {
     protected static final Component RELEASE_BOMB = Component.translatable(MOD_ID + ".stand.release.bomb");
     @Nullable
     protected Bomb bomb;
+    protected final TickTimer<DeadlyQueen> bombTimer;
+    @Nullable
+    protected SheerHeartAttack sheerHeartAttack;
 
     public DeadlyQueen(Level level, Player owner, boolean slim, StandCard standCardId) {
         super(level, owner, slim, standCardId);
+        this.bombTimer = this.createTimer();
+    }
+
+    protected TickTimer<DeadlyQueen> createTimer() {
+        return new TickTimer<>(this, deadlyQueen -> {
+            if (deadlyQueen.bomb != null) {
+                deadlyQueen.bomb.explode();
+            }
+        });
     }
 
     @Override
@@ -66,6 +83,8 @@ public class DeadlyQueen extends Stand {
         if (this.bomb != null) {
             this.bomb.tick();
         }
+
+        this.bombTimer.tick();
     }
 
     @Override
@@ -96,14 +115,53 @@ public class DeadlyQueen extends Stand {
 
     @Override
     public void onInteractAtAir() {
-        if (this.bomb != null && this.bomb.getExplodeWhen() == When.PUSH_SWITCH) {
-            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), CLICK.get(), this.getSoundSource(), 1.0F, 1.0F);
+        if (this.bomb != null && this.getOwner().isShiftKeyDown() && this.bomb.getExplodeWhen() == When.PUSH_SWITCH) {
             this.bomb.ignite();
+        } else if (this.sheerHeartAttack == null) {
+            this.sheerHeartAttack = new SheerHeartAttack(this);
+            this.sheerHeartAttack.setPos(this.position());
+            this.level().addFreshEntity(this.sheerHeartAttack);
+        } else {
+            this.sheerHeartAttack.discard();
+            this.sheerHeartAttack = null;
         }
+    }
+
+    public TickTimer<DeadlyQueen> getBombTimer() {
+        return this.bombTimer;
     }
 
     public void placeBomb(Bomb bomb) {
         this.bomb = bomb;
+        this.giveSwitchToOwner();
+    }
+
+    protected void giveSwitchToOwner() {
+        if (!this.level().isClientSide && this.bomb != null && this.bomb.getExplodeWhen() == When.PUSH_SWITCH) {
+            var switch_ = new ItemStack(IGNITION_SWITCH.get());
+            if (this.getOwner().getInventory().add(switch_)) {
+                this.level().playSound(null, this.getOwner().getX(), this.getOwner().getY(), this.getOwner().getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, ((this.getOwner().getRandom().nextFloat() - this.getOwner().getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                int slot = this.getOwner().getInventory().findSlotMatchingItem(switch_);
+                if (Inventory.isHotbarSlot(slot)) {
+                    this.getOwner().getInventory().selected = slot;
+                }
+                this.getOwner().containerMenu.broadcastChanges();
+            } else {
+                var e = this.getOwner().drop(switch_, false);
+                if (e != null) {
+                    e.setNoPickUpDelay();
+                    e.setTarget(this.getOwner().getUUID());
+                }
+            }
+        }
+    }
+
+    public void igniteBomb() {
+        if (this.bomb == null) {
+            return;
+        }
+
+        this.bomb.ignite();
     }
 
     public void releaseBomb() {
