@@ -7,16 +7,14 @@ import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.When;
 import com.hamusuke.standup.stand.ability.deadly_queen.bomb.EntityBomb;
 import com.hamusuke.standup.stand.ai.goal.StandRushAttackGoal;
-import com.hamusuke.standup.stand.ai.goal.target.StandMultipleAttackableTargetsGoal;
 import com.hamusuke.standup.stand.ai.goal.target.StandOwnerHurtTargetGoal;
 import com.hamusuke.standup.stand.card.StandCard;
 import com.hamusuke.standup.util.TickTimer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -55,11 +53,7 @@ public class DeadlyQueen extends Stand {
         super.registerGoals();
 
         this.goalSelector.addGoal(3, new StandRushAttackGoal(this, 3, true));
-
         this.targetSelector.addGoal(1, new StandOwnerHurtTargetGoal(this));
-        this.targetSelector.addGoal(2, new StandMultipleAttackableTargetsGoal<>(this, LivingEntity.class, false, livingEntity -> {
-            return !this.getOwner().isCreative() && livingEntity instanceof Enemy;
-        }));
     }
 
     @Override
@@ -139,11 +133,13 @@ public class DeadlyQueen extends Stand {
     protected void giveSwitchToOwner() {
         if (!this.level().isClientSide && this.bomb != null && this.bomb.getExplodeWhen() == When.PUSH_SWITCH) {
             var switch_ = new ItemStack(IGNITION_SWITCH.get());
+            var copied = switch_.copy();
             if (this.getOwner().getInventory().add(switch_)) {
                 this.level().playSound(null, this.getOwner().getX(), this.getOwner().getY(), this.getOwner().getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, ((this.getOwner().getRandom().nextFloat() - this.getOwner().getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
-                int slot = this.getOwner().getInventory().findSlotMatchingItem(switch_);
+                int slot = this.getOwner().getInventory().findSlotMatchingItem(copied);
                 if (Inventory.isHotbarSlot(slot)) {
                     this.getOwner().getInventory().selected = slot;
+                    ((ServerPlayer) this.getOwner()).connection.send(new ClientboundSetCarriedItemPacket(slot));
                 }
                 this.getOwner().containerMenu.broadcastChanges();
             } else {
