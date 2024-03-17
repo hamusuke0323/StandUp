@@ -37,7 +37,6 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegistryBuilder;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -145,22 +144,22 @@ public class StandUp {
             }
 
             var players = List.copyOf(dragon.level().players());
-            Collections.shuffle(players);
             if (players.isEmpty()) {
                 return;
             }
 
-            var player = players.get(0);
-            if (player.getInventory().add(card)) {
-                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
-                player.containerMenu.broadcastChanges();
-            } else {
-                var e = player.drop(card, false);
-                if (e != null) {
-                    e.setNoPickUpDelay();
-                    e.setTarget(player.getUUID());
+            Util.getRandomSafe(players, dragon.getRandom()).ifPresent(player -> {
+                if (player.getInventory().add(card)) {
+                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                    player.containerMenu.broadcastChanges();
+                } else {
+                    var e = player.drop(card, false);
+                    if (e != null) {
+                        e.setNoPickUpDelay();
+                        e.setTarget(player.getUUID());
+                    }
                 }
-            }
+            });
         }
     }
 

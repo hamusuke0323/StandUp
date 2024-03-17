@@ -56,10 +56,11 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
 
     @Override
     public void standDown() {
-        if (this.isStandAlive()) {
-            this.stand.discard();
+        if (!this.isStandAlive()) {
+            return;
         }
 
+        this.stand.discard();
         var owner = this.stand.getOwner();
         this.stand = null;
 
