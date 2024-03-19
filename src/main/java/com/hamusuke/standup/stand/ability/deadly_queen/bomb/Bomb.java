@@ -8,15 +8,16 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level.ExplosionInteraction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.compress.utils.Sets;
 
 import java.util.Set;
@@ -36,6 +37,7 @@ public abstract class Bomb {
     protected final Set<Entity> touchedEntities = Sets.newHashSet();
     protected boolean ignited;
     protected boolean exploded;
+    protected final boolean explodeManyTimes = true;
 
     protected Bomb(DeadlyQueen stand, When explodeWhen, What whatExplodes) {
         this.stand = stand;
@@ -49,7 +51,7 @@ public abstract class Bomb {
             return;
         }
 
-        var touchingEntities = this.level.getEntitiesOfClass(this.getType(), this.createAABB(), this::consideredTouching);
+        var touchingEntities = this.level.getEntitiesOfClass(Entity.class, this.createAABB(), this::consideredTouching);
         if (touchingEntities.isEmpty()) {
             return;
         }
@@ -60,7 +62,7 @@ public abstract class Bomb {
     }
 
     public void ignite() {
-        if (this.ignited) {
+        if (this.ignited || !this.isStillValid()) {
             return;
         }
 
@@ -90,7 +92,7 @@ public abstract class Bomb {
     }
 
     public void explode() {
-        if (!this.ignited || this.exploded) {
+        if (!this.ignited || !this.isStillValid()) {
             return;
         }
 
@@ -98,13 +100,37 @@ public abstract class Bomb {
 
         switch (this.whatExplodes) {
             case SELF -> this.explodeSelf();
-            case TOUCHING_ENTITY -> this.explodeTouchingEntity();
+            case TOUCHING_ENTITY -> this.explodeTouchingEntities();
+        }
+
+        this.onExploded();
+    }
+
+    protected void onExploded() {
+        if (this.explodeManyTimes) {
+            this.exploded = false;
+            this.ignited = false;
         }
     }
 
-    protected abstract void explodeSelf();
+    protected void explodeSelf() {
+        var pos = this.getExplosionPos();
+        this.level.explode(this.stand, this.getSource(), this.createDamageCalculator(), pos.x(), pos.y(), pos.z(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
+    }
 
-    protected abstract void explodeTouchingEntity();
+    protected void explodeTouchingEntities() {
+        this.touchedEntities.addAll(this.level.getEntitiesOfClass(Entity.class, this.createAABB(), this::consideredTouching));
+        this.touchedEntities.forEach(this::explodeEachTouchingEntity);
+    }
+
+    protected void explodeEachTouchingEntity(Entity entity) {
+        this.level.explode(this.stand, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
+        if (!(entity instanceof LivingEntity)) {
+            entity.kill();
+        }
+    }
+
+    protected abstract Vec3 getExplosionPos();
 
     protected abstract AABB createAABB();
 
@@ -140,12 +166,8 @@ public abstract class Bomb {
         return new BombDamageCalculator(this);
     }
 
-    protected <T extends Entity> Class<T> getType() {
-        return (Class<T>) Entity.class;
-    }
-
     protected boolean consideredTouching(Entity entity) {
-        return entity != this.stand && entity != this.stand.getOwner();
+        return entity.isAlive() && entity != this.stand && entity != this.stand.getOwner();
     }
 
     protected boolean shouldExplode(Entity entity) {
@@ -153,7 +175,7 @@ public abstract class Bomb {
     }
 
     public boolean isStillValid() {
-        return !this.exploded;
+        return !this.exploded || this.explodeManyTimes;
     }
 
     public enum When {
@@ -205,7 +227,7 @@ public abstract class Bomb {
 
         @Override
         public float getEntityDamageAmount(Explosion p_310428_, Entity p_310135_) {
-            return this.bomb.shouldExplode(p_310135_) ? super.getEntityDamageAmount(p_310428_, p_310135_) * Mth.PI : 0.0F;
+            return this.bomb.shouldExplode(p_310135_) ? Float.MAX_VALUE : 0.0F;
         }
     }
 }

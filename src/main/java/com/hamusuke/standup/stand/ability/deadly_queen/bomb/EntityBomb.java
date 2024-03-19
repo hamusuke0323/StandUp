@@ -1,10 +1,9 @@
 package com.hamusuke.standup.stand.ability.deadly_queen.bomb;
 
 import com.hamusuke.standup.stand.stands.DeadlyQueen;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class EntityBomb extends Bomb {
     protected final Entity target;
@@ -16,19 +15,8 @@ public class EntityBomb extends Bomb {
     }
 
     @Override
-    protected void explodeSelf() {
-        this.level.explode(this.stand, this.getSource(), this.createDamageCalculator(), this.target.getX(), this.target.getY(), this.target.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
-    }
-
-    @Override
-    protected void explodeTouchingEntity() {
-        this.touchedEntities.addAll(this.level.getEntitiesOfClass(Entity.class, this.createAABB(), this::shouldExplode));
-        this.touchedEntities.forEach(entity -> {
-            this.level.explode(this.stand, this.getSource(), this.createDamageCalculator(), entity.getX(), entity.getY(), entity.getZ(), this.getRadius(), this.fire(), this.getInteraction(), this.getSmallExplosionParticle(), this.getLargeExplosionParticle(), this.getExplosionSound());
-            if (!(entity instanceof LivingEntity)) {
-                entity.kill();
-            }
-        });
+    protected Vec3 getExplosionPos() {
+        return this.target.position();
     }
 
     @Override
@@ -52,11 +40,6 @@ public class EntityBomb extends Bomb {
     @Override
     protected float getRadius() {
         return 3.0F;
-    }
-
-    @Override
-    protected DamageSource getSource() {
-        return this.level.damageSources().explosion(this.target, this.stand.getOwner());
     }
 
     @Override

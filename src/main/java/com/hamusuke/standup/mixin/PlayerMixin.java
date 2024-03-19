@@ -106,6 +106,18 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerInvoker 
     }
 
     @Override
+    public double distanceToSqr(double p_20276_, double p_20277_, double p_20278_) {
+        if (!this.isControllingStand()) {
+            return super.distanceToSqr(p_20276_, p_20277_, p_20278_);
+        }
+
+        double d0 = this.getStand().getX() - p_20276_;
+        double d1 = this.getStand().getY() - p_20277_;
+        double d2 = this.getStand().getZ() - p_20278_;
+        return d0 * d0 + d1 * d1 + d2 * d2;
+    }
+
+    @Override
     public boolean isPickable() {
         return !this.isControllingStand() && super.isPickable();
     }
