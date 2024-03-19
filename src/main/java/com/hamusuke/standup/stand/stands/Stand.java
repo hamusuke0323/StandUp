@@ -23,8 +23,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -283,15 +281,6 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         }
 
         super.onItemPickup(p_21054_);
-    }
-
-    @Override
-    public boolean canTakeItem(ItemStack p_21522_) {
-        if (this.getOwner() instanceof ServerPlayer serverPlayer) {
-            return serverPlayer.canTakeItem(p_21522_);
-        }
-
-        return false;
     }
 
     @Override
@@ -643,16 +632,6 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
     @Override
     public boolean skipAttackInteraction(Entity p_20357_) {
         return p_20357_ instanceof Player player && player == this.getOwner();
-    }
-
-    @Override
-    public InteractionResult interactAt(Player p_19980_, Vec3 p_19981_, InteractionHand p_19982_) {
-        if (p_19980_ != this.getOwner() || !this.getOwner().isShiftKeyDown()) {
-            return InteractionResult.PASS;
-        }
-
-        p_19980_.openMenu(this);
-        return InteractionResult.sidedSuccess(this.level().isClientSide);
     }
 
     public void onInteractAtBlock(BlockHitResult result, boolean checkReach) {

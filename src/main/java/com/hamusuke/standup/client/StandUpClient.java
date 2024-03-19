@@ -44,6 +44,7 @@ public class StandUpClient {
     private static final KeyMapping HOLD_OR_RELEASE_OWNER = new KeyMapping(MOD_ID + ".key.stand.holdorrelease", GLFW.GLFW_KEY_C, MOD_ID + ".key.category");
     private static final KeyMapping TOGGLE_STAND_OPERATION_MODE = new KeyMapping(MOD_ID + ".key.stand.toggle", GLFW.GLFW_KEY_X, MOD_ID + ".key.category");
     private static final KeyMapping USE_STAND_ABILITY = new KeyMapping(MOD_ID + ".key.stand.ability", GLFW.GLFW_KEY_V, MOD_ID + ".key.category");
+    private static final KeyMapping OPEN_STAND_CARD_MENU = new KeyMapping(MOD_ID + ".key.stand.open.menu", GLFW.GLFW_KEY_B, MOD_ID + ".key.category");
     private static StandUpClient INSTANCE;
 
     private StandUpClient() {
@@ -71,6 +72,7 @@ public class StandUpClient {
         event.register(HOLD_OR_RELEASE_OWNER);
         event.register(TOGGLE_STAND_OPERATION_MODE);
         event.register(USE_STAND_ABILITY);
+        event.register(OPEN_STAND_CARD_MENU);
     }
 
     @SubscribeEvent
@@ -122,6 +124,10 @@ public class StandUpClient {
                 }
 
                 NetworkManager.sendToServer(new UseStandAbilityNotify(mc.hitResult));
+            }
+
+            while (OPEN_STAND_CARD_MENU.consumeClick()) {
+                NetworkManager.sendToServer(new StandCardMenuOpenReq());
             }
         }
     }

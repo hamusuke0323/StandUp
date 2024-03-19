@@ -37,7 +37,7 @@ public abstract class Bomb {
     protected final Set<Entity> touchedEntities = Sets.newHashSet();
     protected boolean ignited;
     protected boolean exploded;
-    protected final boolean explodeManyTimes = true;
+    protected final boolean explodeManyTimes = false;
 
     protected Bomb(DeadlyQueen stand, When explodeWhen, What whatExplodes) {
         this.stand = stand;

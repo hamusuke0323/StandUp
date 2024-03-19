@@ -38,6 +38,11 @@ public final class NetworkManager {
                 .decoder(buf -> new HoldOrReleaseOwnerReq())
                 .consumerNetworkThread(Packet::handle)
                 .add();
+        MAIN.messageBuilder(StandCardMenuOpenReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Packet::write)
+                .decoder(buf -> new StandCardMenuOpenReq())
+                .consumerNetworkThread(Packet::handle)
+                .add();
         MAIN.messageBuilder(StandDownReq.class, ID.get(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(Packet::write)
                 .decoder(buf -> new StandDownReq())

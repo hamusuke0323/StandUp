@@ -13,6 +13,7 @@
   "standup.config.canOpenGate": "Stands can open fence gates",
   "standup.config.setStandCardMsg": "Send a message when set stand card",
   "standup.system.again": "Stand up again to apply change of stand card!",
+  "standup.system.open.menu": "Stand up first to open the menu!",
   "standup.cards.deadly_queen": "Deadly Queen",
   "standup.cards.star_platinum": "Star Platinum",
   "standup.key.category": "Stand Up",
@@ -23,5 +24,6 @@
   "standup.key.stand.updown": "Stand Up/Down",
   "standup.key.stand.holdorrelease": "Hold/Release Stand Owner",
   "standup.key.stand.toggle": "Toggle Stand Operation Mode",
-  "standup.key.stand.ability": "Use Stand Ability"
+  "standup.key.stand.ability": "Use Stand Ability",
+  "standup.key.stand.open.menu": "Open Stand Card Menu"
 }
