@@ -48,6 +48,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
+import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -258,6 +259,11 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
 
     @Override
     protected boolean isAffectedByFluids() {
+        return false;
+    }
+
+    @Override
+    public boolean isPushedByFluid(FluidType type) {
         return false;
     }
 
