@@ -76,7 +76,7 @@ public abstract class Bomb {
     }
 
     protected void playIgnitionSound() {
-        this.stand.level().playSound(null, this.stand.getX(), this.stand.getY(), this.stand.getZ(), CLICK.get(), this.stand.getSoundSource(), 5.0F, 1.0F);
+        this.stand.level().playSound(null, this.stand.getX(), this.stand.getY(), this.stand.getZ(), CLICK.get(), this.stand.getSoundSource(), 1.0F, 1.0F);
     }
 
     public boolean alreadyIgnited() {

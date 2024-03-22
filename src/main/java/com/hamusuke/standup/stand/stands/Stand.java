@@ -219,7 +219,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         this.followOwnerTick();
         this.updateSwingTime();
 
-        if (this.getY() < this.level().dimensionType().minY()) {
+        if (this.isFollowingOwner() && this.getY() < this.level().dimensionType().minY()) {
             this.moveTo(this.getOwner().position().add(0.2D, 0.2D, 0.2D));
         }
     }
@@ -337,6 +337,7 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
         var pos = this.getOwner().position();
         this.absMoveTo(pos.x, pos.y, pos.z);
         this.setDeltaMovement(Vec3.ZERO);
+        this.hurtMarked = true;
     }
 
     public void stopHoldingOwner() {
@@ -538,8 +539,10 @@ public class Stand extends PathfinderMob implements MenuProvider, MultipleTarget
             serverPlayer.yya = 0.0F;
             serverPlayer.zza = 0.0F;
             serverPlayer.setDeltaMovement(Vec3.ZERO);
+            serverPlayer.hurtMarked = true;
 
             this.setDeltaMovement(Vec3.ZERO);
+            this.hurtMarked = true;
 
             switch (this.mode) {
                 case AI -> this.setToAI();
