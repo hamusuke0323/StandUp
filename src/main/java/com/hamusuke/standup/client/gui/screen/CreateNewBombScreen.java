@@ -1,5 +1,6 @@
 package com.hamusuke.standup.client.gui.screen;
 
+import com.hamusuke.standup.client.StandUpClient;
 import com.hamusuke.standup.client.gui.component.ComponentList;
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.InteractionDataSerializer;
@@ -28,8 +29,8 @@ public class CreateNewBombScreen extends Screen {
     private final HitResult result;
     private final Component targetDesc;
     private ComponentList list;
-    private When when = When.TOUCH;
-    private What what = What.TOUCHING_ENTITY;
+    private When when = StandUpClient.whenRef;
+    private What what = StandUpClient.whatRef;
 
     public CreateNewBombScreen(HitResult result) {
         super(TITLE);
@@ -86,5 +87,7 @@ public class CreateNewBombScreen extends Screen {
         this.onClose();
 
         NetworkManager.sendToServer(new AskBombInfoRsp(new InteractionDataSerializer(this.result), this.when, this.what));
+        StandUpClient.whenRef = this.when;
+        StandUpClient.whatRef = this.what;
     }
 }

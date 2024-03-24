@@ -7,6 +7,8 @@ import com.hamusuke.standup.client.renderer.entity.StandRenderer;
 import com.hamusuke.standup.invoker.PlayerInvoker;
 import com.hamusuke.standup.network.NetworkManager;
 import com.hamusuke.standup.network.packet.c2s.*;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.What;
+import com.hamusuke.standup.stand.ability.deadly_queen.bomb.Bomb.When;
 import com.hamusuke.standup.stand.stands.Stand;
 import com.hamusuke.standup.world.item.StandCardItem;
 import net.minecraft.client.CameraType;
@@ -46,6 +48,8 @@ public class StandUpClient {
     private static final KeyMapping USE_STAND_ABILITY = new KeyMapping(MOD_ID + ".key.stand.ability", GLFW.GLFW_KEY_V, MOD_ID + ".key.category");
     private static final KeyMapping OPEN_STAND_CARD_MENU = new KeyMapping(MOD_ID + ".key.stand.open.menu", GLFW.GLFW_KEY_B, MOD_ID + ".key.category");
     private static StandUpClient INSTANCE;
+    public static When whenRef = When.TOUCH;
+    public static What whatRef = What.TOUCHING_ENTITY;
 
     private StandUpClient() {
         INSTANCE = this;
